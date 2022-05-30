@@ -7,6 +7,7 @@ import {
     isValidMimeType,
     writeFile
 } from "../../../utils/fileUtils";
+import prisma from "../../../utils/prisma";
 
 const upload = multer({ storage: memoryStorage() }).single('file');
 
@@ -50,5 +51,52 @@ router.post('/', (req, res, next) => {
 
     return res.status(200).send({ 'success': 'File uploaded', file: file })
 });
+
+router.get('/:id', async (req, res) => {
+    const { id } = req.params
+    const parsedId = parseInt(id)
+
+    if (isNaN(parsedId)) return res.status(400).send({ 'error': 'Invalid id' })
+
+
+    const file = await getFileById(parsedId)
+    if (!file) return res.status(404).send({ 'error': 'No files found' })
+    return res.status(200).send(file)
+})
+
+/*
+
+    Begin helper functions
+
+*/
+
+/*
+    Finds a post by id
+    @param id - the id of the post to find
+    @returns the post if found, otherwise null
+*/
+async function getFileById(id: number) {
+    return await prisma.file.findUnique({
+        where: {
+            id: id
+        }, select: {
+            id: true,
+            filename: true,
+            createdAt: true,
+            updatedAt: true,
+            source: true,
+            approved: true,
+            rating: true,
+            tags: {
+                select: {
+                    id: true,
+                    tag: true,
+                    namespace: true,
+                    _count: true,
+                }
+            }
+        }
+    })
+}
 
 export default router;
