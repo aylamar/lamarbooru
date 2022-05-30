@@ -182,6 +182,30 @@ export async function isValidMimeType(mimetype: string): Promise<boolean> {
     return allowedMimeTypes.includes(mimetype)
 }
 
+export async function updateFile(id: number, dataPayload: dataPayload) {
+    return await prisma.file.update({
+        where: { id: id },
+        data: dataPayload,
+        select: {
+            id: true,
+            filename: true,
+            createdAt: true,
+            updatedAt: true,
+            source: true,
+            approved: true,
+            rating: true,
+            tags: {
+                select: {
+                    id: true,
+                    tag: true,
+                    namespace: true,
+                    _count: true,
+                }
+            }
+        }
+    })
+}
+
 /*
     Writes a file to the fileBasePath, then generates a thumbnail
     @param file: Multer file
@@ -195,7 +219,20 @@ export async function writeFile(file: Buffer, fileName: string) {
     await generateThumbnail(filePath);
 }
 
-interface connectQuery {
+export interface connectQuery {
     where: { tag_namespace: { tag: string, namespace: Namespace } }
     create: { tag: string, namespace: Namespace }
+}
+
+export interface disconnectQuery {
+    id: number
+}
+
+export interface dataPayload {
+    rating?: Rating,
+    source?: string,
+    tags: {
+        connectOrCreate: connectQuery[],
+        disconnect: disconnectQuery[]
+    }
 }

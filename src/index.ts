@@ -10,6 +10,7 @@ const port = process.env.PORT || 3000;
 
 // Set location of public files & set cache
 const short = 7 * 24 * 60 * 60 * 1000;
+server.use(express.json());
 server.use('/public', express.static('public', { maxAge: short }));
 server.use(express.urlencoded({
     limit: '20kb',
