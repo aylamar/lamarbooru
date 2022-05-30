@@ -67,31 +67,10 @@ Arguments:
 ```json title="Successful Reponse (201)"
 {
     "id": 1,
-    "filename": "c3bb72a9-4cbe-4872-b7b2-bf9e27bfa3e8.jpeg",
-    "createdAt": "2022-05-30T15:52:35.297Z",
-    "updatedAt": "2022-05-30T15:52:35.298Z",
-    "source": ["https://www.example.com/image.jpeg"],
-    "approved": true,
-    "rating": "safe",
-    "tags": [
-        {
-            "id": 1,
-            "tag": "1girl",
-            "namespace": "tag",
-        },
-        {
-            "id": 2,
-            "tag": "absurdres",
-            "namespace": "meta",
-        },
-        {
-            "id": 6,
-            "tag": "yom",
-            "namespace": "creator"
-        }
-    ]
+    ... full file data ...
 }
 ```
+
 Unsuccessful response codes:
 
 * 400: Missing required fields or invalid file type.
@@ -101,7 +80,7 @@ Unsuccessful response codes:
 {
     "error": "File already exists",
     file: {
-        ...file data of matching file...
+        ... file data of matching file ...
     }
 }
 ```
@@ -138,47 +117,7 @@ Arguments:
 ```json title="Successful Reponse (200)"
 {
     "id": 1,
-    "filename": "c3bb72a9-4cbe-4872-b7b2-bf9e27bfa3e8.jpeg",
-    "createdAt": "2022-05-30T15:52:35.297Z",
-    "updatedAt": "2022-05-30T15:52:35.298Z",
-    "source": [
-        "https://www.example.com/example.jpg"
-    ],
-    "approved": false,
-    "rating": "safe",
-    "tags": [
-        {
-            "id": 4,
-            "tag": "absurdres",
-            "namespace": "meta",
-            "_count": {
-                "files": 1
-            }
-        },
-        {
-            "id": 5,
-            "tag": "1girl",
-            "namespace": "tag",
-            "_count": {
-                "files": 1
-            }
-        },
-        {
-            "id": 7,
-            "tag": "yomu",
-            "namespace": "creator",
-            "_count": {
-                "files": 1
-            }
-        },
-        {
-            "id": 8,
-            "tag": "1boy",
-            "namespace": "tag",
-            "_count": {
-                "files": 1
-            }
-        }
+    ... full file data with changes ...
     ]
 }
 ```
@@ -188,3 +127,31 @@ Unsuccessful response codes:
 * 400: Missing required fields or invalid field data.
 * 404: No file found with that id.
 * 500: Database error while updating file.
+
+### GET `/api/file/search/:page`
+
+_Get a page of 32 files using, optionally filtered by tag_
+
+Parameters:
+
+* `page`: (required) The page number, must one or greater.
+* `tags`: (optional) The tag to filter by, any number of tags are supported and should be seperated by a space of a "+".
+
+```json title="Successful Reponse (200)"
+[
+    {
+        "id": 5,
+        ... full file data ...
+     },
+     {
+        "id": 4,
+        ... full file data ...
+     },
+     ... etc ...
+]
+```
+
+Unsuccessful response codes:
+
+* 400: Missing required fields or invalid field data.
+* 404: No files found with the parameters provided.
