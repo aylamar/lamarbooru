@@ -1,0 +1,10 @@
+version: '3'
+services:
+  db:
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=very_secure_password_that_you_should_probably_change
+      - POSTGRES_DB=postgres

@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Image {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  filename  String   @unique
+
+  hash       String   @unique
+  tags       Tag[]
+  source     String[]
+  rating     Rating   @default(explicit)
+  approved   Boolean  @default(false)
+
+  @@map("images")
+}
+
+model Tag {
+  id        Int       @id @default(autoincrement())
+  tag       String
+  namespace Namespace
+  images    Image[]
+
+  @@unique([tag, namespace])
+  @@map("tags")
+}
+
+enum Site {
+  danbooru
+}
+
+enum Namespace {
+  character
+  creator
+  series
+  tag
+  meta
+}
+
+enum Rating {
+  safe
+  questionable
+  explicit
+}
