@@ -1,12 +1,12 @@
 import { Router } from "express";
 import multer, { memoryStorage } from "multer";
 import {
-    checkIfHashExists, createImage, generateConnectQuery, generateFileName,
+    checkIfHashExists, createFile, generateConnectQuery, generateFileName,
     getExtensionFromMimeType,
     getFileHash, getRating,
     isValidMimeType,
     writeFile
-} from "../../../utils/imageUtils";
+} from "../../../utils/fileUtils";
 
 const upload = multer({ storage: memoryStorage() }).single('file');
 
@@ -17,18 +17,19 @@ router.post('/', (req, res, next) => {
         next()
     })
 }, async (req, res) => {
-    const file = req.file
-    if (!file) return res.status(400);
+    const rawFile = req.file
+    if (!rawFile) return res.status(400);
 
-    const valid = await isValidMimeType(file.mimetype)
-    if (!valid) return res.status(400).send({ 'error': 'Invalid file type' })
+    const valid = await isValidMimeType(rawFile.mimetype)
+    console.log(rawFile.mimetype)
+    if (!valid) return res.status(400).send({ 'error': 'Invalid rawFile type' })
 
-    const hash = await getFileHash(file.buffer)
-    const imageExists = await checkIfHashExists(hash)
-    if (imageExists) return res.status(303).send({ 'error': 'Image already exists', image: imageExists })
+    const hash = await getFileHash(rawFile.buffer)
+    const fileExists = await checkIfHashExists(hash)
+    if (fileExists) return res.status(303).send({ 'error': 'File already exists', file: fileExists })
 
-    const extension = await getExtensionFromMimeType(file.mimetype)
-    if (!extension) return res.status(400).send({ 'error': 'Invalid file type' })
+    const extension = await getExtensionFromMimeType(rawFile.mimetype)
+    if (!extension) return res.status(400).send({ 'error': 'Invalid rawFile type' })
 
     // parse values from request
     let { tags, artist, rating, source } = req.body
@@ -43,11 +44,11 @@ router.post('/', (req, res, next) => {
     if (!source) source = null
 
     const fileName = await generateFileName(extension)
-    const image = await createImage(fileName, hash, connectQuery, rating, source)
+    const file = await createFile(fileName, hash, connectQuery, rating, source)
 
-    await writeFile(file.buffer, fileName)
+    await writeFile(rawFile.buffer, fileName)
 
-    return res.status(200).send({ 'success': 'Image uploaded', image: image })
+    return res.status(200).send({ 'success': 'File uploaded', file: file })
 });
 
 export default router;

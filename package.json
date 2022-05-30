@@ -5,8 +5,8 @@
   "main": "index.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "launch": "node lib/index.js",
-    "clean": "rm -r lib",
+    "launch": "node dist/index.js",
+    "clean": "rm -r dist",
     "rebuild": "npm run clean && npm run build",
     "start": "npm run build && npm run launch",
     "test": "jest --detectOpenHandles --forceExit"

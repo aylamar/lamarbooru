@@ -7,7 +7,7 @@ import {
     getRating,
     isValidExtension,
     isValidMimeType
-} from "./imageUtils";
+} from "./fileUtils";
 import fs from "fs";
 
 

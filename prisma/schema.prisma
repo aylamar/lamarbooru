@@ -10,7 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Image {
+model File {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -22,14 +22,14 @@ model Image {
   rating     Rating   @default(explicit)
   approved   Boolean  @default(false)
 
-  @@map("images")
+  @@map("files")
 }
 
 model Tag {
   id        Int       @id @default(autoincrement())
   tag       String
   namespace Namespace
-  images    Image[]
+  files     File[]
 
   @@unique([tag, namespace])
   @@map("tags")

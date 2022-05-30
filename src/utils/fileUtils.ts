@@ -10,13 +10,13 @@ const thumbnailBasePath = "./public/thumbnail";
 const allowedExtensions = ["png", "jpg", "jpeg"];
 
 /*
-    Checks to see is an image exists already in database
+    Checks to see is an file exists already in database
     @param Multer file
     @returns true or false based on whether file is valid
  */
 export async function checkIfHashExists(hash: string) {
     // @ts-ignore
-    return await prisma.image.findUnique({
+    return await prisma.file.findUnique({
         where: {
             hash: hash
         }, include: {
@@ -49,11 +49,11 @@ async function createFolders(fileName: string) {
     @param source: Source urls in array of strings
     @returns Image object
 */
-export async function createImage(fileName: string, hash: string, connectQuery: connectQuery[], rating?: Rating, source?: string[]) {
+export async function createFile(fileName: string, hash: string, connectQuery: connectQuery[], rating?: Rating, source?: string[]) {
     if (!rating) rating = Rating.explicit
     if (!source) source = []
 
-    return await prisma.image.create({
+    return await prisma.file.create({
         data: {
             filename: fileName, hash: hash, rating: rating, source: source, tags: {
                 connectOrCreate: connectQuery
