@@ -22,7 +22,6 @@ router.post('/', (req, res, next) => {
     if (!rawFile) return res.status(400);
 
     const valid = await isValidMimeType(rawFile.mimetype)
-    console.log(rawFile.mimetype)
     if (!valid) return res.status(400).send({ 'error': 'Invalid rawFile type' })
 
     const hash = await getFileHash(rawFile.buffer)
@@ -40,7 +39,6 @@ router.post('/', (req, res, next) => {
     const arr = [...creator ? [creator] : [], ...tagsArray]
     const connectQuery = await generateConnectQuery(arr)
 
-    // if tags, creator, rating, or source is undefined, set to null
     rating = await getRating(rating)
     if (!source) source = null
 
