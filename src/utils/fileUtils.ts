@@ -124,7 +124,6 @@ export async function getFileHash(file: Buffer): Promise<string> {
 */
 export async function getNamespace(tag: string): Promise<Namespace> {
     let namespace: Namespace = Namespace.tag
-// if tag starts with "artist:" then set namespace to artist
     if (tag.startsWith("creator:")) {
         namespace = Namespace.creator
     } else if (tag.startsWith("series:")) {

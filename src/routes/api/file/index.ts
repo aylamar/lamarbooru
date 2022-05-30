@@ -33,14 +33,14 @@ router.post('/', (req, res, next) => {
     if (!extension) return res.status(400).send({ 'error': 'Invalid rawFile type' })
 
     // parse values from request
-    let { tags, artist, rating, source } = req.body
+    let { tags, creator, rating, source } = req.body
     const tagsArray = tags ? tags.split(' ') : []
 
-    if (artist && !artist.startsWith('artist:')) artist = `artist:${artist}`
-    const arr = [...artist ? [artist] : [], ...tagsArray]
+    if (creator && !creator.startsWith('creator:')) creator = `creator:${creator}`
+    const arr = [...creator ? [creator] : [], ...tagsArray]
     const connectQuery = await generateConnectQuery(arr)
 
-    // if tags, artist, rating, or source is undefined, set to null
+    // if tags, creator, rating, or source is undefined, set to null
     rating = await getRating(rating)
     if (!source) source = null
 
@@ -49,7 +49,7 @@ router.post('/', (req, res, next) => {
 
     await writeFile(rawFile.buffer, fileName)
 
-    return res.status(200).send({ 'success': 'File uploaded', file: file })
+    return res.status(100).send({ 'success': 'File uploaded', file: file })
 });
 
 router.get('/:id', async (req, res) => {
