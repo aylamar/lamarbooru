@@ -17,7 +17,7 @@ import {
     writeFile,
 } from '../../../utils/fileUtils';
 import prisma from '../../../utils/prisma';
-import { updateSchema } from './fileValidation';
+import { idSchema, tagSchema, updateSchema } from './fileValidation';
 
 const upload = multer({ storage: memoryStorage() }).single('file');
 
@@ -138,6 +138,28 @@ router.put('/:id', async (req, res) => {
     return res.status(200).send(updatedFile);
 });
 
+// GET with :page and optional :tags
+router.get('/search/:id/', async (req, res) => {
+    let data: { id: number };
+    let tagData: { tags?: string };
+    try {
+        data = await idSchema.validateAsync(req.params);
+        tagData = await tagSchema.validateAsync(req.query);
+    } catch (err: any) {
+        return res.status(400).send(err.details);
+    }
+
+    const page = data.id;
+    let tags: string[] | undefined;
+    if (tagData.tags) tags = tagData.tags.split(' ');
+
+    const files = await searchImages(page, tags);
+    if (!files) return res.status(404).send({ 'error': 'No files found' });
+
+    res.status(200).send(files);
+});
+
+
 export default router;
 
 /*
@@ -173,4 +195,45 @@ async function getFileById(id: number) {
             },
         },
     });
+}
+
+async function searchImages(idx: number, tags?: string[]) {
+    if (tags) {
+        return await prisma.file.findMany({
+            where: {
+                tags: { some: { tag: { in: tags } } },
+            },
+            orderBy: {
+                id: 'desc',
+            },
+            include: {
+                tags: {
+                    select: {
+                        id: true,
+                        tag: true,
+                        namespace: true,
+                        _count: true,
+                    },
+                },
+            },
+            skip: idx - 1, take: 32,
+        });
+    } else {
+        return await prisma.file.findMany({
+            orderBy: {
+                id: 'desc',
+            },
+            include: {
+                tags: {
+                    select: {
+                        id: true,
+                        tag: true,
+                        namespace: true,
+                        _count: true,
+                    },
+                },
+            },
+            skip: idx - 1, take: 32,
+        });
+    }
 }
