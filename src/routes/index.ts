@@ -1,5 +1,5 @@
 import { Router } from "express";
-import apiRoutes from "./api/";
+import apiRoutes from "./api/api.controller";
 
 let router = Router();
 router.use('/api', apiRoutes);
