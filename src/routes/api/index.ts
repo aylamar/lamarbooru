@@ -1,5 +1,5 @@
 import { Router } from "express";
-import fileRoutes from "./file/";
+import fileRoutes from "./file/file.controller";
 
 let router = Router();
 router.use('/file', fileRoutes);

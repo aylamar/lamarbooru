@@ -1,6 +1,5 @@
 import { Rating } from '@prisma/client';
-import { Router } from 'express';
-import multer, { memoryStorage } from 'multer';
+import { Request, Response } from 'express';
 import {
     checkIfHashExists,
     connectQuery,
@@ -17,33 +16,24 @@ import {
     writeFile,
 } from '../../../utils/fileUtils';
 import prisma from '../../../utils/prisma';
-import { idSchema, tagSchema, updateSchema } from './fileValidation';
+import { idSchema, tagSchema, updateSchema } from './file.validation';
 
-const upload = multer({ storage: memoryStorage() }).single('file');
-
-let router = Router();
-
-/*
-    Uploads a new file to the database
- */
-router.post('/', (req, res, next) => {
-    upload(req, res, (err) => {
-        if (err) return res.status(400).send({ 'error': 'No valid file attached' });
-        next();
-    });
-}, async (req, res) => {
+export async function uploadFileHandler(req: Request, res: Response) {
     const rawFile = req.file;
-    if (!rawFile) return res.status(400);
-
+    if (!rawFile) return res.status(400).send({ 'error': 'No valid file attached' });
     const valid = await isValidMimeType(rawFile.mimetype);
     if (!valid) return res.status(400).send({ 'error': 'Invalid rawFile type' });
+
+    console.log('hit');
 
     const hash = await getFileHash(rawFile.buffer);
     const fileExists = await checkIfHashExists(hash);
     if (fileExists) return res.status(303).send({ 'error': 'File already exists', file: fileExists });
 
     const extension = await getExtensionFromMimeType(rawFile.mimetype);
-    if (!extension) return res.status(400).send({ 'error': 'Invalid rawFile type' });
+    if (!extension) return res.status(400).send({ 'error': 'Invalid file type' });
+
+    console.log('middle');
 
     // parse values from request
     let { tags, creator, rating, source } = req.body;
@@ -60,14 +50,12 @@ router.post('/', (req, res, next) => {
     const file = await createFile(fileName, hash, connectQuery, rating, source);
 
     await writeFile(rawFile.buffer, fileName);
+    console.log('final');
 
-    return res.status(100).send({ 'success': 'File uploaded', file: file });
-});
+    return res.status(200).send({ 'success': 'File uploaded', file: file });
+}
 
-/*
-    Finds a post by id
- */
-router.get('/:id', async (req, res) => {
+export async function getFileHandler(req: Request, res: Response) {
     const { id } = req.params;
     const parsedId = parseInt(id);
     if (isNaN(parsedId)) return res.status(400).send({ 'error': 'Invalid id' });
@@ -75,12 +63,9 @@ router.get('/:id', async (req, res) => {
     const file = await getFileById(parsedId);
     if (!file) return res.status(404).send({ 'error': 'No files found' });
     return res.status(200).send(file);
-});
+}
 
-/*
-    Updates an existing file by id
- */
-router.put('/:id', async (req, res) => {
+export async function updateFileHandler(req: Request, res: Response) {
     let data: {
         tags: string[],
         rating?: Rating,
@@ -136,10 +121,9 @@ router.put('/:id', async (req, res) => {
     if (!updatedFile) return res.status(500).send({ 'error': 'Error updating file' });
 
     return res.status(200).send(updatedFile);
-});
+}
 
-// GET with :page and optional :tags
-router.get('/search/:id/', async (req, res) => {
+export async function searchFileHandler(req: Request, res: Response) {
     let data: { id: number };
     let tagData: { tags?: string };
     try {
@@ -157,10 +141,7 @@ router.get('/search/:id/', async (req, res) => {
     if (!files) return res.status(404).send({ 'error': 'No files found' });
 
     res.status(200).send(files);
-});
-
-
-export default router;
+}
 
 /*
 
@@ -197,6 +178,12 @@ async function getFileById(id: number) {
     });
 }
 
+/*
+    Search for a page of 32 images with optional tags
+    @param page - the page to search
+    @param tags - the tags to search for
+    @returns the page of images if found, otherwise empty array
+ */
 async function searchImages(idx: number, tags?: string[]) {
     if (tags) {
         return await prisma.file.findMany({
