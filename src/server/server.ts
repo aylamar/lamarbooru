@@ -1,5 +1,7 @@
 import express from 'express';
 import routeController from './routes/route.controller.js';
+//@ts-ignore
+import { handler } from '../client/handler.js';
 
 const server = express();
 const port = process.env.PORT || 3000;
@@ -11,6 +13,7 @@ server.use('/public', express.static('public', { maxAge: short }));
 server.use(express.urlencoded({
     limit: '20kb', extended: true,
 }));
+server.use(handler);
 
 // initialize routes
 server.use(routeController);

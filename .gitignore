@@ -115,3 +115,7 @@ build
 # User image folders
 /public/original/*
 /public/thumbnail/*
+
+# Build artifacts and Svelte Kit
+/build
+/.svelte-kit
