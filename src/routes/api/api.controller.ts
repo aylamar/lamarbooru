@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { apiRedirectHandler } from './api.service';
-import fileRoutes from "./file/file.controller";
+import { apiRedirectHandler } from './api.service.js';
+import fileRoutes from "./file/file.controller.js";
 
 let router = Router();
 

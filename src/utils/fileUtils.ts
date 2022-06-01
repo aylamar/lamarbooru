@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import fs from "fs";
 import sharp from "sharp";
-import prisma from "./prisma";
+import prisma from "./prisma.js";
 import { Namespace, Rating } from "@prisma/client";
 import { v4 as uuid } from "uuid";
 
@@ -10,7 +10,7 @@ const thumbnailBasePath = "./public/thumbnail";
 const allowedExtensions = ["png", "jpg", "jpeg"];
 
 /*
-    Checks to see is an file exists already in database
+    Checks to see is a file exists already in database
     @param Multer file
     @returns true or false based on whether file is valid
  */

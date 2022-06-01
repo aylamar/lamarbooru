@@ -14,9 +14,9 @@ import {
     isValidMimeType,
     updateFile,
     writeFile,
-} from '../../../utils/fileUtils';
-import prisma from '../../../utils/prisma';
-import { idSchema, tagSchema, updateSchema } from './file.validation';
+} from '../../../utils/fileUtils.js';
+import prisma from '../../../utils/prisma.js';
+import { idSchema, tagSchema, updateSchema } from './file.validation.js';
 
 export async function uploadFileHandler(req: Request, res: Response) {
     const rawFile = req.file;

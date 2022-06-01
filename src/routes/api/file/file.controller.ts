@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import multer, { memoryStorage } from 'multer';
-import { getFileHandler, searchFileHandler, updateFileHandler, uploadFileHandler } from './file.service';
+import { getFileHandler, searchFileHandler, updateFileHandler, uploadFileHandler } from './file.service.js';
 
 const upload = multer({ storage: memoryStorage() });
 

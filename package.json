@@ -4,13 +4,15 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "launch": "node dist/index.js",
-    "clean": "rm -r dist",
+    "build": "npm run build:server",
+    "build:server": "tsc -p tsconfig.json",
+    "launch": "node build/backend/server.js",
+    "clean": "rm -r build/backend",
     "rebuild": "npm run clean && npm run build",
     "start": "npm run build && npm run launch",
     "test": "jest --detectOpenHandles --forceExit"
   },
+  "type": "module",
   "author": "aylamar",
   "license": "",
   "dependencies": {
