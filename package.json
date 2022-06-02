@@ -12,7 +12,8 @@
     "rebuild": "npm run clean && npm run build",
     "start": "npm run build && npm run launch",
     "test": "jest --detectOpenHandles --forceExit",
-    "dev:client": "svelte-kit dev --port 3001"
+    "dev:client": "svelte-kit dev --port 3001",
+    "dev:server": "npm run build:server && node build/server/server.js"
   },
   "type": "module",
   "author": "aylamar",
