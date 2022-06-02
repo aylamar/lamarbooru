@@ -143,6 +143,12 @@ export async function searchFileHandler(req: Request, res: Response) {
     res.status(200).send(files);
 }
 
+export async function getFileStats(req: Request, res: Response) {
+    const files = await prisma.file.count();
+    const tags = await prisma.tag.count();
+    return res.status(200).send({ files: files, tags: tags });
+}
+
 /*
 
     Begin helper functions
