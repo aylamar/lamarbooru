@@ -1,3 +1,4 @@
+import cors from 'cors';
 import express from 'express';
 import routeController from './routes/route.controller.js';
 //@ts-ignore
@@ -5,6 +6,11 @@ import { handler } from '../client/handler.js';
 
 const server = express();
 const port = process.env.PORT || 3000;
+
+// use cors to allow cross origin requests
+server.use(cors({
+    origin: '*',
+}));
 
 // Set location of public files & set cache
 const short = 7 * 24 * 60 * 60 * 1000;
