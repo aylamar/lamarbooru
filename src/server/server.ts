@@ -13,10 +13,11 @@ server.use('/public', express.static('public', { maxAge: short }));
 server.use(express.urlencoded({
     limit: '20kb', extended: true,
 }));
-server.use(handler);
-
 // initialize routes
 server.use(routeController);
+// initialize svelte-kit
+server.use(handler);
+
 
 server.listen(port);
 console.log(`Server listening on port ${ port }`);
