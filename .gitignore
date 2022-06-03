@@ -1,9 +1,6 @@
 # Config Files
 config.json
 
-# lib folder
-lib/
-
 # idea folder
 .idea/
 
