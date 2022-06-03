@@ -16,15 +16,25 @@ import {
     writeFile,
 } from '../../../utils/fileUtils.js';
 import prisma from '../../../utils/prisma.js';
-import { idSchema, tagSchema, updateSchema } from './file.validation.js';
+import { fileSchema, idSchema, tagSchema } from './file.validation.js';
 
 export async function uploadFileHandler(req: Request, res: Response) {
+    let data: {
+        tags: string[],
+        rating?: Rating,
+        source?: string[],
+    };
+
+    try {
+        data = await fileSchema.validateAsync(req.body);
+    } catch (err: any) {
+        return res.status(400).send(err.details);
+    }
+
     const rawFile = req.file;
     if (!rawFile) return res.status(400).send({ 'error': 'No valid file attached' });
     const valid = await isValidMimeType(rawFile.mimetype);
     if (!valid) return res.status(400).send({ 'error': 'Invalid rawFile type' });
-
-    console.log('hit');
 
     const hash = await getFileHash(rawFile.buffer);
     const fileExists = await checkIfHashExists(hash);
@@ -33,24 +43,16 @@ export async function uploadFileHandler(req: Request, res: Response) {
     const extension = await getExtensionFromMimeType(rawFile.mimetype);
     if (!extension) return res.status(400).send({ 'error': 'Invalid file type' });
 
-    console.log('middle');
+    const connectQuery = await generateConnectQuery(data.tags);
 
-    // parse values from request
-    let { tags, creator, rating, source } = req.body;
-    const tagsArray = tags ? tags.split(' ') : [];
-
-    if (creator && !creator.startsWith('creator:')) creator = `creator:${ creator }`;
-    const arr = [...creator ? [creator] : [], ...tagsArray];
-    const connectQuery = await generateConnectQuery(arr);
-
-    rating = await getRating(rating);
-    if (!source) source = null;
+    const rating = await getRating(data.rating);
+    let source: string[] = [];
+    if (data.source) source = data.source;
 
     const fileName = await generateFileName(extension);
     const file = await createFile(fileName, hash, connectQuery, rating, source);
 
     await writeFile(rawFile.buffer, fileName);
-    console.log('final');
 
     return res.status(200).send({ 'success': 'File uploaded', file: file });
 }
@@ -73,7 +75,7 @@ export async function updateFileHandler(req: Request, res: Response) {
     };
 
     try {
-        data = await updateSchema.validateAsync(req.body);
+        data = await fileSchema.validateAsync(req.body);
     } catch (err: any) {
         return res.status(400).send(err.details);
     }
