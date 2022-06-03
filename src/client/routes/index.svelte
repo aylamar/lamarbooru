@@ -1,10 +1,36 @@
+<script context="module" lang="ts">
+    import { stats } from '../lib/stores/stats';
+
+
+    export async function load({ fetch, url }) {
+        const res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/file/stats`);
+        stats.set(await res.json());
+        return {
+            stats: res.status,
+        };
+    }
+</script>
+
 <script lang="ts">
-    let searchParams = ''
+    import { params, derivedParams } from '../lib/stores/search';
+    import { goto } from '$app/navigation';
 
     export let handleOnSubmit = (e) => {
+        console.log('hit');
         e.preventDefault();
-        console.log('todo')
-    }
+
+        if ($params.searchParams) {
+            goto(`/posts?tags=${ $derivedParams }`);
+            return {
+                status: 200,
+            };
+        } else {
+            goto('/posts');
+            return {
+                status: 200,
+            };
+        }
+    };
 </script>
 
 <div class="grid place-items-center mt-60">
@@ -14,12 +40,16 @@
             <a class="text-center font-bold" href="/posts">All Posts</a>
         </div>
         <form class="grid grid-cols-4 pb-3" on:submit={handleOnSubmit}>
-            <input bind:value={searchParams} class="w-text-slate-400 bg-slate-800 px-3 py-2 rounded-l-md col-span-3 shadow-sm" type="search" placeholder="long_hair 1girl">
-            <button onclick={handleOnSubmit} class="rounded-r-md font-semibold px-3 py-2 text-sm bg-sky-500 text-white shadow-sm">Search</button>
+            <input bind:value={$params.searchParams}
+                   class="w-text-slate-400 bg-slate-800 px-3 py-2 rounded-l-md col-span-3 shadow-sm" placeholder="long_hair 1girl"
+                   type="search">
+            <button class="rounded-r-md font-semibold px-3 py-2 text-sm bg-sky-500 text-white shadow-sm"
+                    onclick={handleOnSubmit}>Search
+            </button>
         </form>
         <div class="grid grid-cols-2">
-            <span class="text-center">X Posts</span>
-            <span class="text-center">X Tags</span>
+            <span class="text-center">{$stats.files} Posts</span>
+            <span class="text-center">{$stats.tags} Tags</span>
         </div>
     </div>
 </div>
