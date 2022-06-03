@@ -51,14 +51,12 @@ _Add a new file to the database._
 Arguments:
 
 * `file`: (required) The file to upload.
-* `creator`: (optional) The creator of the file.
+* `tags`:  (required) Array of strings containing tags.
 * `rating`: (optional) The rating of the file (must be safe, questionable, or explicit).
-* `tags`:  (optional) String containing tags seperated by spaces.
 
 ```json title="Example request body"
 {
-    "creator": "yom",
-    "tags": "meta:absurdres 1girl",
+    "tags": ['meta:absurdres', '1girl', 'creator:yom'],
     "source": "https://www.example.com/image.jpeg",
     "rating": "safe",
 }
@@ -95,7 +93,7 @@ Parameters:
 
 Arguments:
 
-* `tags`:  (required) String containing tags seperated by spaces.
+* `tags`:  (required) Array of strings containing tags.
 * `rating`: (optional) The rating of the file (must be safe, questionable, or explicit).
 * `source`: (optional) The source url of the file.
 
