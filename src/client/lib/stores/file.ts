@@ -4,7 +4,9 @@ export type Tag = {
     id: string;
     tag: string;
     namespace: string;
-    _count: number;
+    _count: {
+        files: number;
+    };
 };
 
 export type File = {
@@ -28,7 +30,7 @@ export const fileUrl = writable('');
 export const originalUrl = writable('');
 
 export const artistTags = derived(file, (file) => {
-    let artists = []
+    let artists = [];
     for (const i in file.tags) {
         if (file.tags[i].namespace === 'creator') {
             artists.push(file.tags[i]);
@@ -38,7 +40,7 @@ export const artistTags = derived(file, (file) => {
 });
 
 export const characterTags = derived(file, (file) => {
-    let characterTags = []
+    let characterTags = [];
     for (const i in file.tags) {
         if (file.tags[i].namespace === 'character') {
             characterTags.push(file.tags[i]);
@@ -48,7 +50,7 @@ export const characterTags = derived(file, (file) => {
 });
 
 export const seriesTags = derived(file, (file) => {
-    let series = []
+    let series = [];
     for (const i in file.tags) {
         if (file.tags[i].namespace === 'series') {
             series.push(file.tags[i]);
@@ -58,7 +60,7 @@ export const seriesTags = derived(file, (file) => {
 });
 
 export const metaTags = derived(file, (file) => {
-    let meta = []
+    let meta = [];
     for (const i in file.tags) {
         if (file.tags[i].namespace === 'meta') {
             meta.push(file.tags[i]);
@@ -68,7 +70,7 @@ export const metaTags = derived(file, (file) => {
 });
 
 export const normalTags = derived(file, (file) => {
-    let artists = []
+    let artists = [];
     for (const i in file.tags) {
         if (file.tags[i].namespace === 'tag') {
             artists.push(file.tags[i]);

@@ -1,53 +1,53 @@
 <script context="module" lang="ts">
-    import type { File } from "../../lib/stores/file";
-    import { params, files } from "../../lib/stores/search";
+    import type { File } from '../../lib/stores/file';
+    import { files, params } from '../../lib/stores/search';
 
     export async function load({ fetch, url }) {
-        const param: string = url.searchParams.get("tags");
-        let res: Response
+        const param: string = url.searchParams.get('tags');
+        let res: Response;
 
         if (param) {
-            res = await fetch(`${import.meta.env.VITE_BASE_URL}api/file/search/1?tags=${ param }`);
+            res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/file/search/1?tags=${ param }`);
         } else {
-            res = await fetch(`${import.meta.env.VITE_BASE_URL}api/file/search/1`)
+            res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/file/search/1`);
         }
 
         if (res.ok) {
             params.set({
                 searchParams: param,
-                idx: 1
-            })
+                idx: 1,
+            });
 
-            const filesVar: File[] = await res.json()
-            files.set(filesVar)
-            return { status: 200 }
+            const filesVar: File[] = await res.json();
+            files.set(filesVar);
+            return { status: 200 };
         } else {
             return {
                 status: res.status,
-                error: new Error(res.statusText)
-            }
+                error: new Error(res.statusText),
+            };
         }
     }
 </script>
 
 <script lang="ts">
-    import { derivedTags } from '../../lib/stores/search'
-    import Tags from '../../lib/components/files/tags.svelte'
-    import Search from '../../lib/components/files/search.svelte'
-    import Thumbnail from '../../lib/components/files/thumbnail.svelte'
+    import { derivedTags } from '../../lib/stores/search';
+    import Tags from '../../lib/components/search/tags.svelte';
+    import Search from '../../lib/components/search/search.svelte';
+    import Thumbnail from '../../lib/components/search/thumbnail.svelte';
 
     async function fetchFiles() {
-        let res: Response
+        let res: Response;
 
         if ($params.searchParams) {
-            res = await fetch(`${import.meta.env.VITE_BASE_URL}api/file/search/${ $params.idx + 32 }/${ $params.searchParams }`);
+            res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/file/search/${ $params.idx + 32 }/${ $params.searchParams }`);
         } else {
-            res = await fetch(`${import.meta.env.VITE_BASE_URL}api/file/search/${ $params.idx + 32 }`)
+            res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/file/search/${ $params.idx + 32 }`);
         }
 
         if (res.ok) {
-            $params.idx = $params.idx + 32
-            $files = [...$files, ...await res.json()]
+            $params.idx = $params.idx + 32;
+            $files = [...$files, ...await res.json()];
         }
     }
 
@@ -65,8 +65,8 @@
             },
             {
                 threshold: 0.5,
-                rootMargin: '0px'
-            }
+                rootMargin: '0px',
+            },
         );
     }
 
@@ -76,8 +76,8 @@
         return {
             destroy() {
                 intersectionObserver.unobserve(element);
-            }
-        }
+            },
+        };
     }
 </script>
 
