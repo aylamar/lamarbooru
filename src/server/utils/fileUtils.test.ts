@@ -1,5 +1,5 @@
 import {
-    generateConnectQuery,
+    generateTagConnectQuery,
     generateFileName,
     getExtensionFromMimeType,
     getFileHash,
@@ -39,7 +39,7 @@ describe('ImageUtils', () => {
     });
 
     it('should generate a connect query', async () => {
-        expect(await generateConnectQuery(['1girl', 'creator:test_creator', 'series:test_series', 'character:test_character', 'meta:absurdres'])).toStrictEqual([
+        expect(await generateTagConnectQuery(['1girl', 'creator:test_creator', 'series:test_series', 'character:test_character', 'meta:absurdres'])).toStrictEqual([
             {
                 "create": {
                     "namespace": "tag",

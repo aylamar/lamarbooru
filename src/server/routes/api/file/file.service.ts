@@ -2,16 +2,17 @@ import { Rating } from '@prisma/client';
 import { Request, Response } from 'express';
 import {
     checkIfHashExists,
-    connectQuery,
     createFile,
     dataPayload,
     disconnectQuery,
-    generateConnectQuery,
     generateFileName,
+    generateTagConnectQuery,
+    generateUrlConnectQuery,
     getExtensionFromMimeType,
     getFileHash,
     getRating,
     isValidMimeType,
+    tagConnectQuery,
     updateFile,
     writeFile,
 } from '../../../utils/fileUtils.js';
@@ -43,14 +44,15 @@ export async function uploadFileHandler(req: Request, res: Response) {
     const extension = await getExtensionFromMimeType(rawFile.mimetype);
     if (!extension) return res.status(400).send({ 'error': 'Invalid file type' });
 
-    const connectQuery = await generateConnectQuery(data.tags);
-
-    const rating = await getRating(data.rating);
+    const tagConnectQuery = await generateTagConnectQuery(data.tags);
     let source: string[] = [];
     if (data.source) source = data.source;
+    const sources = await generateUrlConnectQuery(source)
+
+    const rating = await getRating(data.rating);
 
     const fileName = await generateFileName(extension);
-    const file = await createFile(fileName, hash, connectQuery, rating, source);
+    const file = await createFile(fileName, hash, tagConnectQuery, sources, rating);
 
     await writeFile(rawFile.buffer, fileName);
 
@@ -71,7 +73,7 @@ export async function updateFileHandler(req: Request, res: Response) {
     let data: {
         tags: string[],
         rating?: Rating,
-        source?: string,
+        source?: string[],
     };
 
     try {
@@ -83,7 +85,7 @@ export async function updateFileHandler(req: Request, res: Response) {
     if (!req.params?.id) return res.status(400);
     const { id } = req.params;
     const parsedId = parseInt(id);
-    const { tags, rating, source } = data;
+    let { tags, rating, source } = data;
 
     const file = await getFileById(parsedId);
     if (!file) return res.status(404).send({ 'error': 'No files found' });
@@ -109,15 +111,19 @@ export async function updateFileHandler(req: Request, res: Response) {
     }
 
     // Add new tags that are in use
-    let connectQuery: connectQuery[] = await generateConnectQuery(tags);
+    const tagConnectQuery: tagConnectQuery[] = await generateTagConnectQuery(tags);
+    if (!source) source = []
+    const urlConnectQuery = await generateUrlConnectQuery(source)
     let dataPayload: dataPayload = {
+        source: {
+            connectOrCreate: urlConnectQuery,
+        },
         tags: {
-            connectOrCreate: connectQuery,
+            connectOrCreate: tagConnectQuery,
             disconnect: disconnectQuery,
         },
     };
     if (rating) dataPayload.rating = rating;
-    if (source) dataPayload.source = source;
 
     const updatedFile = await updateFile(parsedId, dataPayload);
     if (!updatedFile) return res.status(500).send({ 'error': 'Error updating file' });

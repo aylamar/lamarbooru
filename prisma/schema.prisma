@@ -18,7 +18,7 @@ model File {
 
   hash       String   @unique
   tags       Tag[]
-  source     String[]
+  source     Url[]
   rating     Rating   @default(explicit)
   approved   Boolean  @default(false)
 
@@ -35,8 +35,27 @@ model Tag {
   @@map("tags")
 }
 
+model Url {
+  id                String       @id @unique @default(uuid())
+  site              Site
+  url               String
+  status            UrlStatus    @default(downloaded)
+  File              File[]
+  @@unique([site, url])
+  @@map("urls")
+}
+
+enum UrlStatus {
+  downloaded
+  skipped
+  failed
+  deleted
+}
+
 enum Site {
   danbooru
+  pixiv
+  unknown
 }
 
 enum Namespace {

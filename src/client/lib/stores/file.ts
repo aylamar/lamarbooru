@@ -9,12 +9,19 @@ export type Tag = {
     };
 };
 
+export type Source = {
+    id: string,
+    site: string,
+    url: string,
+    status: string
+}
+
 export type File = {
     id: number;
     filename: string;
     createdAt: string;
     updatedAt: string;
-    source: string[];
+    source: Source[];
     approved: boolean;
     rating: string;
     uploader: { username: string };

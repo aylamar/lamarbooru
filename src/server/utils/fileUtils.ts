@@ -2,7 +2,7 @@ import crypto from "crypto";
 import fs from "fs";
 import sharp from "sharp";
 import prisma from "./prisma.js";
-import { Namespace, Rating } from "@prisma/client";
+import { Namespace, Rating, Site } from "@prisma/client";
 import { v4 as uuid } from "uuid";
 
 const fileBasePath = "./public/original";
@@ -44,18 +44,19 @@ async function createFolders(fileName: string) {
     Adds a file to the database
     @param file: Multer file object
     @param hash: Hash of file
-    @param connectQuery: connectOrReplace query for all tags attached to a file
+    @param tagConnectQuery: connectOrReplace query for all tags attached to a file
     @param rating: Enumerated rating of a file
     @param source: Source urls in array of strings
     @returns Image object
 */
-export async function createFile(fileName: string, hash: string, connectQuery: connectQuery[], rating?: Rating, source?: string[]) {
+export async function createFile(fileName: string, hash: string, connectQuery: tagConnectQuery[], source: urlConnectQuery[], rating?: Rating) {
     if (!rating) rating = Rating.explicit
     if (!source) source = []
 
     return await prisma.file.create({
         data: {
-            filename: fileName, hash: hash, rating: rating, source: source, tags: {
+            filename: fileName, hash: hash, rating: rating, source: { connectOrCreate: source },
+            tags: {
                 connectOrCreate: connectQuery
             }
         },
@@ -66,12 +67,12 @@ export async function createFile(fileName: string, hash: string, connectQuery: c
 }
 
 /*
-    Generates connectOrReplace query for a tag list of tags
+    Generates connectOrReplace query for a tag list of strings
     @param tags: Array of tags to generate connect query for
     @returns Array of connectOrReplace queries
 */
-export async function generateConnectQuery(tags?: string[]): Promise<connectQuery[]> {
-    let connectQuery: connectQuery[] = [];
+export async function generateTagConnectQuery(tags?: string[]): Promise<tagConnectQuery[]> {
+    let connectQuery: tagConnectQuery[] = [];
     if (!tags) return []
 
     for (const i in tags) {
@@ -79,9 +80,30 @@ export async function generateConnectQuery(tags?: string[]): Promise<connectQuer
         const namespace = await getNamespace(tag);
         tag = tag.replace(/^.*:/, "");
 
-        connectQuery.push(<connectQuery>{
+        connectQuery.push(<tagConnectQuery>{
             where: { tag_namespace: { tag: tag, namespace: namespace } },
             create: { tag: tag, namespace: namespace }
+        })
+    }
+    return connectQuery;
+}
+
+/*
+    Generates connectOrReplace query for an url list of strings
+    @param urls: Array of strings to generate connect query for
+    @returns Array of connectOrReplace queries
+*/
+export async function generateUrlConnectQuery(urls: string[]): Promise<urlConnectQuery[]> {
+    let connectQuery: urlConnectQuery[] = [];
+    if (!urls) return []
+
+    for (const i in urls) {
+        let url = urls[i].replace(/ /g, "_");
+        const site = await getSite(url);
+
+        connectQuery.push(<urlConnectQuery>{
+            where: { site_url: { site: site, url: url } },
+            create: { site: site, url: url }
         })
     }
     return connectQuery;
@@ -135,6 +157,19 @@ export async function getNamespace(tag: string): Promise<Namespace> {
     }
     return namespace
 }
+
+export async function getSite(url: string): Promise<Site> {
+    const parsedUrl = new URL(url)
+    switch (parsedUrl.host) {
+        case 'danbooru.donmai.us':
+            return Site.danbooru
+        case 'pixiv.net':
+            return Site.pixiv
+        default:
+            return Site.unknown
+    }
+}
+
 
 /*
     Returns the proper rating tag based on the provided string
@@ -219,9 +254,15 @@ export async function writeFile(file: Buffer, fileName: string) {
     await generateThumbnail(filePath);
 }
 
-export interface connectQuery {
+export interface tagConnectQuery {
     where: { tag_namespace: { tag: string, namespace: Namespace } }
     create: { tag: string, namespace: Namespace }
+}
+
+
+export interface urlConnectQuery {
+    where: { site_url: { site: Site, url: string } }
+    create: { site: Site, url: string }
 }
 
 export interface disconnectQuery {
@@ -230,9 +271,11 @@ export interface disconnectQuery {
 
 export interface dataPayload {
     rating?: Rating,
-    source?: string,
+    source?: {
+        connectOrCreate: urlConnectQuery[]
+    },
     tags: {
-        connectOrCreate: connectQuery[],
+        connectOrCreate: tagConnectQuery[],
         disconnect: disconnectQuery[]
     }
 }

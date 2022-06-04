@@ -16,7 +16,12 @@ Parameters:
     "filename": "c3bb72a9-4cbe-4872-b7b2-bf9e27bfa3e8.jpeg",
     "createdAt": "2022-05-30T15:52:35.297Z",
     "updatedAt": "2022-05-30T15:52:35.298Z",
-    "source": ["https://www.example.com/image.jpeg"],
+    "source": {
+        "id": "86739154-6dd0-4e94-b8a8-b623c313228d",
+        "site": "danbooru",
+        "url": "https://www.example.com/image.jpeg",
+        "status": "downloaded"
+    }
     "approved": true,
     "rating": "safe",
     "tags": [
@@ -52,12 +57,13 @@ Arguments:
 
 * `file`: (required) The file to upload.
 * `tags`:  (required) Array of strings containing tags.
-* `rating`: (optional) The rating of the file (must be safe, questionable, or explicit).
+* `rating`: (optional) The rating of the file (must be safe, questionable, or explicit), defaults to explicit.
+* `source`: (optional) Sources of file in an array of strings.
 
 ```json title="Example request body"
 {
-    "tags": ['meta:absurdres', '1girl', 'creator:yom'],
-    "source": "https://www.example.com/image.jpeg",
+    "tags": ["meta:absurdres", "1girl", "creator:yom"],
+    "source": ["https://www.example.com/image.jpeg"],
     "rating": "safe",
 }
 ```
@@ -95,7 +101,7 @@ Arguments:
 
 * `tags`:  (required) Array of strings containing tags.
 * `rating`: (optional) The rating of the file (must be safe, questionable, or explicit).
-* `source`: (optional) The source url of the file.
+* `source`: (optional) Sources of file in an array of strings.
 
 ```json title="Example request body"
 {

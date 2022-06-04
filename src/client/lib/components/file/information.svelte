@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { file } from '../../stores/file';
+    import { file, fileUrl } from '../../stores/file';
 </script>
 
 <div class="information max-w-fit">
@@ -15,10 +15,10 @@
             <li>Sources:</li>
             {#each $file.source as source}
                 <li class="break-words"><a class="text-blue-400"
-                                           href={source}>{source.split("://")[1].replace("www.", "")}</a>
+                                           href={source.url}>{source.site}</a>
             {/each}
         {/if}
-        <li><a class="text-blue-400" href="{import.meta.env.VITE_BASE_URL}public/original/{$file.id}.png">View
+        <li><a class="text-blue-400" href="{ $fileUrl }">View
             original</a></li>
     </ul>
 </div>
