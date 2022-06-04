@@ -12,7 +12,7 @@
         <ul>
             {#each tags as tag}
                 <li>
-                    <a href="/posts/?tags={tag.tag}" class={fontColor}>{tag.tag}</a>
+                    <a href="/files/?tags={tag.tag}" class={fontColor}>{tag.tag}</a>
                     <span class="text-slate-500 break-all">{tag._count.files}</span>
                 </li>
             {/each}

@@ -45,14 +45,14 @@
 
     let joinedTags = tagArr.join('\n');
 
-    // send the post to the server
-    async function savePost() {
+    // send the file to the server
+    async function saveFile() {
         // needed due to typescript not recognizing .value
         //@ts-ignore
         let tags = document.getElementById('tags').value.split('\n');
 
         // send the put to the server
-        const res = await fetch(`${ import.meta.env.VITE_BASE_URL }/api/posts/update/${ $file.id }`, {
+        const res = await fetch(`${ import.meta.env.VITE_BASE_URL }/api/files/${ $file.id }`, {
             method: 'PUT',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': 'http://localhost*' },
@@ -107,7 +107,7 @@
         </div>
         <div class="bottom-0 left-0">
             <button class="rounded-md font-semibold px-3 py-2 text-sm bg-sky-500 text-white shadow-sm w-48"
-                    on:click={savePost}>Update
+                    on:click={saveFile}>Update
             </button>
         </div>
     </div>

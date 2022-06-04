@@ -47,7 +47,7 @@
     <ul>
         {#each processedTags as tag}
             <li>
-                <a href="/posts/?tags={tag.tag}" class={tag.color}>{tag.tag}</a> <span
+                <a href="/files/?tags={tag.tag}" class={tag.color}>{tag.tag}</a> <span
                     class="text-slate-500">{tag.count}</span>
             </li>
         {/each}
