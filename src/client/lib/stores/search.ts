@@ -41,7 +41,7 @@ export const derivedTags = derived(files, (files) => {
             tagsWithData.push({
                 tag: tag.tag,
                 //@ts-ignore
-                _count: tag._count.files,
+                _count: tag._count,
                 namespace: tag.namespace,
                 accumulator: 1
             })
