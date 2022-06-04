@@ -1,13 +1,13 @@
-import crypto from "crypto";
-import fs from "fs";
-import sharp from "sharp";
-import prisma from "./prisma.js";
-import { Namespace, Rating, Site } from "@prisma/client";
-import { v4 as uuid } from "uuid";
+import { File, Namespace, Rating, Site } from '@prisma/client';
+import crypto from 'crypto';
+import fs from 'fs';
+import sharp from 'sharp';
+import { v4 as uuid } from 'uuid';
+import prisma from './prisma.js';
 
-const fileBasePath = "./public/original";
-const thumbnailBasePath = "./public/thumbnail";
-const allowedExtensions = ["png", "jpg", "jpeg"];
+const fileBasePath = './public/original';
+const thumbnailBasePath = './public/thumbnail';
+const allowedExtensions = ['png', 'jpg', 'jpeg'];
 
 /*
     Checks to see is a file exists already in database
@@ -15,13 +15,12 @@ const allowedExtensions = ["png", "jpg", "jpeg"];
     @returns true or false based on whether file is valid
  */
 export async function checkIfHashExists(hash: string) {
-    // @ts-ignore
     return await prisma.file.findUnique({
         where: {
-            hash: hash
+            hash: hash,
         }, include: {
             tags: true,
-        }
+        },
 
     });
 }
@@ -49,21 +48,20 @@ async function createFolders(fileName: string) {
     @param source: Source urls in array of strings
     @returns Image object
 */
-export async function createFile(fileName: string, hash: string, connectQuery: tagConnectQuery[], source: urlConnectQuery[], rating?: Rating) {
-    if (!rating) rating = Rating.explicit
-    if (!source) source = []
+export async function createFile(fileName: string, hash: string, connectQuery: tagConnectQuery[], source: urlConnectQuery[], rating?: Rating): Promise<File> {
+    if (!rating) rating = Rating.explicit;
 
     return await prisma.file.create({
         data: {
             filename: fileName, hash: hash, rating: rating, source: { connectOrCreate: source },
             tags: {
-                connectOrCreate: connectQuery
-            }
+                connectOrCreate: connectQuery,
+            },
         },
         include: {
             tags: true,
-        }
-    })
+        },
+    });
 }
 
 /*
@@ -73,17 +71,17 @@ export async function createFile(fileName: string, hash: string, connectQuery: t
 */
 export async function generateTagConnectQuery(tags?: string[]): Promise<tagConnectQuery[]> {
     let connectQuery: tagConnectQuery[] = [];
-    if (!tags) return []
+    if (!tags) return [];
 
     for (const i in tags) {
-        let tag = tags[i].replace(/ /g, "_");
+        let tag = tags[i].replace(/ /g, '_');
         const namespace = await getNamespace(tag);
-        tag = tag.replace(/^.*:/, "");
+        tag = tag.replace(/^.*:/, '');
 
         connectQuery.push(<tagConnectQuery>{
             where: { tag_namespace: { tag: tag, namespace: namespace } },
-            create: { tag: tag, namespace: namespace }
-        })
+            create: { tag: tag, namespace: namespace },
+        });
     }
     return connectQuery;
 }
@@ -95,16 +93,16 @@ export async function generateTagConnectQuery(tags?: string[]): Promise<tagConne
 */
 export async function generateUrlConnectQuery(urls: string[]): Promise<urlConnectQuery[]> {
     let connectQuery: urlConnectQuery[] = [];
-    if (!urls) return []
+    if (!urls) return [];
 
     for (const i in urls) {
-        let url = urls[i].replace(/ /g, "_");
+        let url = urls[i].replace(/ /g, '_');
         const site = await getSite(url);
 
         connectQuery.push(<urlConnectQuery>{
             where: { site_url: { site: site, url: url } },
-            create: { site: site, url: url }
-        })
+            create: { site: site, url: url },
+        });
     }
     return connectQuery;
 }
@@ -125,7 +123,7 @@ export async function generateFileName(extension: string) {
 async function generateThumbnail(sourceFile: string) {
     await sharp(`${ fileBasePath }/${ sourceFile }`)
         .resize(226, 226, {
-            fit: "inside", withoutEnlargement: true
+            fit: 'inside', withoutEnlargement: true,
         })
         .toFile(`${ thumbnailBasePath }/${ sourceFile }`);
 }
@@ -136,7 +134,7 @@ async function generateThumbnail(sourceFile: string) {
     @returns hash of the file
  */
 export async function getFileHash(file: Buffer): Promise<string> {
-    return crypto.createHash("md5").update(file).digest("hex");
+    return crypto.createHash('md5').update(file).digest('hex');
 }
 
 /*
@@ -145,28 +143,28 @@ export async function getFileHash(file: Buffer): Promise<string> {
     @returns the namespace of the tag
 */
 export async function getNamespace(tag: string): Promise<Namespace> {
-    let namespace: Namespace = Namespace.tag
-    if (tag.startsWith("creator:")) {
-        namespace = Namespace.creator
-    } else if (tag.startsWith("series:")) {
-        namespace = Namespace.series
-    } else if (tag.startsWith("character:")) {
-        namespace = Namespace.character
-    } else if (tag.startsWith("meta:")) {
-        namespace = Namespace.meta
+    let namespace: Namespace = Namespace.tag;
+    if (tag.startsWith('creator:')) {
+        namespace = Namespace.creator;
+    } else if (tag.startsWith('series:')) {
+        namespace = Namespace.series;
+    } else if (tag.startsWith('character:')) {
+        namespace = Namespace.character;
+    } else if (tag.startsWith('meta:')) {
+        namespace = Namespace.meta;
     }
-    return namespace
+    return namespace;
 }
 
 export async function getSite(url: string): Promise<Site> {
-    const parsedUrl = new URL(url)
+    const parsedUrl = new URL(url);
     switch (parsedUrl.host) {
         case 'danbooru.donmai.us':
-            return Site.danbooru
+            return Site.danbooru;
         case 'pixiv.net':
-            return Site.pixiv
+            return Site.pixiv;
         default:
-            return Site.unknown
+            return Site.unknown;
     }
 }
 
@@ -178,14 +176,14 @@ export async function getSite(url: string): Promise<Site> {
  */
 export async function getRating(rating: string | undefined): Promise<Rating> {
     switch (rating) {
-        case "explicit":
-            return Rating.explicit
-        case "questionable":
-            return Rating.questionable
-        case "safe":
-            return Rating.safe
+        case 'explicit':
+            return Rating.explicit;
+        case 'questionable':
+            return Rating.questionable;
+        case 'safe':
+            return Rating.safe;
         default:
-            return Rating.explicit
+            return Rating.explicit;
     }
 }
 
@@ -195,7 +193,7 @@ export async function getRating(rating: string | undefined): Promise<Rating> {
     @returns file extension
  */
 export async function getExtensionFromMimeType(mimeType: string) {
-    return mimeType.split("/").pop();
+    return mimeType.split('/').pop();
 }
 
 /*
@@ -208,13 +206,23 @@ export async function isValidExtension(fileType: string) {
 }
 
 /*
+    Returns the file extension from provided URL
+    @param url: URL of file
+    @returns file extension
+ */
+export async function getFileExtensionFromURL(url: string) {
+    return url.split('.').pop();
+}
+
+
+/*
     Checks to see if file exists in approved mimetypes
     @param Multer file
     @returns true or false based on whether file is valid
  */
 export async function isValidMimeType(mimetype: string): Promise<boolean> {
-    const allowedMimeTypes = ["image/png", "image/jpg", "image/jpeg"]
-    return allowedMimeTypes.includes(mimetype)
+    const allowedMimeTypes = ['image/png', 'image/jpg', 'image/jpeg'];
+    return allowedMimeTypes.includes(mimetype);
 }
 
 export async function updateFile(id: number, dataPayload: dataPayload) {
@@ -235,10 +243,10 @@ export async function updateFile(id: number, dataPayload: dataPayload) {
                     tag: true,
                     namespace: true,
                     _count: true,
-                }
-            }
-        }
-    })
+                },
+            },
+        },
+    });
 }
 
 /*
@@ -247,26 +255,26 @@ export async function updateFile(id: number, dataPayload: dataPayload) {
     @returns fileName: Name of file with extension
  */
 export async function writeFile(file: Buffer, fileName: string) {
-    const filePath = `${ fileName.substring(0, 2) }/${ fileName }`
-    await createFolders(fileName)
+    const filePath = `${ fileName.substring(0, 2) }/${ fileName }`;
+    await createFolders(fileName);
 
     fs.writeFileSync(`${ fileBasePath }/${ filePath }`, file);
     await generateThumbnail(filePath);
 }
 
 export interface tagConnectQuery {
-    where: { tag_namespace: { tag: string, namespace: Namespace } }
-    create: { tag: string, namespace: Namespace }
+    where: { tag_namespace: { tag: string, namespace: Namespace } };
+    create: { tag: string, namespace: Namespace };
 }
 
 
 export interface urlConnectQuery {
-    where: { site_url: { site: Site, url: string } }
-    create: { site: Site, url: string }
+    where: { site_url: { site: Site, url: string } };
+    create: { site: Site, url: string };
 }
 
 export interface disconnectQuery {
-    id: number
+    id: number;
 }
 
 export interface dataPayload {
