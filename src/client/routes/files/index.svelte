@@ -1,6 +1,6 @@
 <script context="module" lang="ts">
-    import type { Post } from "../../lib/stores/post";
-    import { params, posts } from "../../lib/stores/search";
+    import type { File } from "../../lib/stores/file";
+    import { params, files } from "../../lib/stores/search";
 
     export async function load({ fetch, url }) {
         const param: string = url.searchParams.get("tags");
@@ -18,8 +18,8 @@
                 idx: 1
             })
 
-            const postsVar: Post[] = await res.json()
-            posts.set(postsVar)
+            const filesVar: File[] = await res.json()
+            files.set(filesVar)
             return { status: 200 }
         } else {
             return {
@@ -32,11 +32,11 @@
 
 <script lang="ts">
     import { derivedTags } from '../../lib/stores/search'
-    import Tags from '../../lib/components/post/tags.svelte'
-    import Search from '../../lib/components/post/search.svelte'
-    import Thumbnail from '../../lib/components/post/thumbnail.svelte'
+    import Tags from '../../lib/components/files/tags.svelte'
+    import Search from '../../lib/components/files/search.svelte'
+    import Thumbnail from '../../lib/components/files/thumbnail.svelte'
 
-    async function fetchPosts() {
+    async function fetchFiles() {
         let res: Response
 
         if ($params.searchParams) {
@@ -47,7 +47,7 @@
 
         if (res.ok) {
             $params.idx = $params.idx + 32
-            $posts = [...$posts, ...await res.json()]
+            $files = [...$files, ...await res.json()]
         }
     }
 
@@ -88,10 +88,10 @@
     </div>
 
     <div class="flex flex-auto flex-wrap">
-        {#each $posts as post}
-            <Thumbnail filename={post.filename} id={post.id}/>
+        {#each $files as file}
+            <Thumbnail filename={file.filename} id={file.id}/>
         {/each}
-        <div on:enterViewport={() => fetchPosts()} use:viewport></div>
+        <div on:enterViewport={() => fetchFiles()} use:viewport></div>
     </div>
 </div>
 

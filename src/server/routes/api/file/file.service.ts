@@ -88,7 +88,7 @@ export async function updateFileHandler(req: Request, res: Response) {
     const file = await getFileById(parsedId);
     if (!file) return res.status(404).send({ 'error': 'No files found' });
 
-    // iterate through post.tags, and combine namespace:tag
+    // iterate through file.tags, and combine namespace:tag
     let fileTags = [];
     for (const i in file.tags) {
         if (file.tags[i].namespace === 'tag') {
@@ -158,9 +158,9 @@ export async function getFileStats(req: Request, res: Response) {
 */
 
 /*
-    Finds a post by id
-    @param id - the id of the post to find
-    @returns the post if found, otherwise null
+    Finds a file by id
+    @param id - the id of the file to find
+    @returns the file if found, otherwise null
 */
 async function getFileById(id: number) {
     return await prisma.file.findUnique({

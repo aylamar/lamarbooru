@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { Tag } from "../../stores/post";
+    import type { Tag } from "../../stores/file";
     export let tags: Tag[] = [];
 
     type processedTag = {

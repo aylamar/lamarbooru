@@ -2,7 +2,7 @@
     import { stats } from '../lib/stores/stats';
 
 
-    export async function load({ fetch, url }) {
+    export async function load({ fetch }) {
         const res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/file/stats`);
         stats.set(await res.json());
         return {
@@ -20,12 +20,12 @@
         e.preventDefault();
 
         if ($params.searchParams) {
-            goto(`/posts?tags=${ $derivedParams }`);
+            goto(`/files?tags=${ $derivedParams }`);
             return {
                 status: 200,
             };
         } else {
-            goto('/posts');
+            goto('/files');
             return {
                 status: 200,
             };
@@ -35,9 +35,9 @@
 
 <div class="grid place-items-center mt-60">
     <div class="grid grid-rows-4 content-center md:w-1/2 md:max-w-lg">
-        <a class="text-4xl font-bold text-center pb-3" href="/posts">Lamarbooru</a>
+        <a class="text-4xl font-bold text-center pb-3" href="/files">Lamarbooru</a>
         <div class="flex justify-center">
-            <a class="text-center font-bold" href="/posts">All Posts</a>
+            <a class="text-center font-bold" href="/files">All Files</a>
         </div>
         <form class="grid grid-cols-4 pb-3" on:submit={handleOnSubmit}>
             <input bind:value={$params.searchParams}
@@ -48,7 +48,7 @@
             </button>
         </form>
         <div class="grid grid-cols-2">
-            <span class="text-center">{$stats.files} Posts</span>
+            <span class="text-center">{$stats.files} Files</span>
             <span class="text-center">{$stats.tags} Tags</span>
         </div>
     </div>

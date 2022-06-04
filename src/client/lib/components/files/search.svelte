@@ -6,12 +6,12 @@
         e.preventDefault();
 
         if ($params.searchParams) {
-            goto(`/posts?tags=${$derivedParams}`)
+            goto(`/files?tags=${$derivedParams}`)
             return {
                 status: 200,
             }
         } else {
-            goto('/posts')
+            goto('/files')
             return {
                 status: 200,
             }

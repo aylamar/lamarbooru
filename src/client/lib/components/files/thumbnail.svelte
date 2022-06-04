@@ -13,7 +13,7 @@
 </script>
 
 <div class="p-2 relative">
-    <a href="/posts/{id}" class="">
+    <a href="/files/{id}" class="">
         <img class="rounded-xl shadow-xl" transition:fade src="{getImgUrl(filename)}" alt="img">
     </a>
     {#if approved === false}

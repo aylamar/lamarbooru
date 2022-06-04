@@ -1,5 +1,5 @@
 import { derived, writable } from 'svelte/store';
-import type { Post, Tag } from './post';
+import type { File, Tag } from './file';
 
 type Params = {
     searchParams: string;
@@ -22,24 +22,25 @@ export const derivedParams = derived(params, (params) => {
     return params.searchParams.replace(/\s/g, "+");
 })
 
-export const posts = writable<Post[]>([]);
+export const files = writable<File[]>([]);
 
-// iterate through posts and return a list of all tags, then remove duplicates
-export const derivedTags = derived(posts, (posts) => {
+// iterate through files and return a list of all tags, then remove duplicates
+export const derivedTags = derived(files, (files) => {
     let tags: Tag[] = [];
 
     // get list of all tags
-    posts.forEach((post) => {
-        tags = tags.concat(...post.tags);
+    files.forEach((file) => {
+        tags = tags.concat(...file.tags);
     });
 
     let tagsWithData: tagData[] = []
-    // get tag count for each tag in posts
+    // get tag count for each tag in files
     for (const tag of tags) {
         // if tag.tag is not in tagsWithData, add it
         if (!tagsWithData.some(t => t.tag === tag.tag)) {
             tagsWithData.push({
                 tag: tag.tag,
+                //@ts-ignore
                 _count: tag._count.files,
                 namespace: tag.namespace,
                 accumulator: 1
