@@ -46,15 +46,15 @@
     let joinedTags = tagArr.join('\n');
 
     // send the file to the server
-    async function saveFile() {
+    async function saveFile(e) {
+        e.preventDefault();
         // needed due to typescript not recognizing .value
         //@ts-ignore
         let tags = document.getElementById('tags').value.split('\n');
 
         // send the put to the server
-        const res = await fetch(`${ import.meta.env.VITE_BASE_URL }/api/files/${ $file.id }`, {
+        const res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/file/${ $file.id }`, {
             method: 'PUT',
-            credentials: 'include',
             headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': 'http://localhost*' },
             mode: 'cors',
             body: JSON.stringify({
@@ -66,7 +66,7 @@
         const parsedJson: File = await res.json();
         if (res.ok) {
             $file = parsedJson;
-            return $file;
+            return res.status;
         } else {
             return res.status;
         }
