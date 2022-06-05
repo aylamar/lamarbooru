@@ -12,4 +12,8 @@ export const idSchema = Joi.object({
 
 export const tagSchema = Joi.object({
     tags: Joi.string().lowercase().optional(),
-})
+});
+
+export const booruSchema = Joi.object({
+    url: Joi.string().uri().lowercase().required(),
+});

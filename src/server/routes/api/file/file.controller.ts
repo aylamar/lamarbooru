@@ -5,6 +5,7 @@ import {
     getFileStats,
     searchFileHandler,
     updateFileHandler,
+    uploadBooruFile,
     uploadFileHandler,
 } from './file.service.js';
 
@@ -23,5 +24,7 @@ router.get('/:id', getFileHandler);
 router.put('/:id', updateFileHandler);
 // GET /api/file/search/:page to get a page of files
 router.get('/search/:id/', searchFileHandler);
+// PUT /api/file/booru to upload a file from booru
+router.post('/booru', uploadBooruFile);
 
 export default router;

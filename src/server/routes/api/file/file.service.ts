@@ -1,5 +1,6 @@
-import { Rating } from '@prisma/client';
+import { Rating, Site } from '@prisma/client';
 import { Request, Response } from 'express';
+import { DownloaderService } from '../../../downloaders/downloader.service';
 import {
     checkIfHashExists,
     createFile,
@@ -11,13 +12,14 @@ import {
     getExtensionFromMimeType,
     getFileHash,
     getRating,
+    getSite,
     isValidMimeType,
     tagConnectQuery,
     updateFile,
     writeFile,
 } from '../../../utils/fileUtils.js';
 import prisma from '../../../utils/prisma.js';
-import { fileSchema, idSchema, tagSchema } from './file.validation.js';
+import { booruSchema, fileSchema, idSchema, tagSchema } from './file.validation.js';
 
 export async function uploadFileHandler(req: Request, res: Response) {
     let data: {
@@ -47,7 +49,7 @@ export async function uploadFileHandler(req: Request, res: Response) {
     const tagConnectQuery = await generateTagConnectQuery(data.tags);
     let source: string[] = [];
     if (data.source) source = data.source;
-    const sources = await generateUrlConnectQuery(source)
+    const sources = await generateUrlConnectQuery(source);
 
     const rating = await getRating(data.rating);
 
@@ -112,8 +114,8 @@ export async function updateFileHandler(req: Request, res: Response) {
 
     // Add new tags that are in use
     const tagConnectQuery: tagConnectQuery[] = await generateTagConnectQuery(tags);
-    if (!source) source = []
-    const urlConnectQuery = await generateUrlConnectQuery(source)
+    if (!source) source = [];
+    const urlConnectQuery = await generateUrlConnectQuery(source);
     let dataPayload: dataPayload = {
         source: {
             connectOrCreate: urlConnectQuery,
@@ -155,6 +157,26 @@ export async function getFileStats(req: Request, res: Response) {
     const files = await prisma.file.count();
     const tags = await prisma.tag.count();
     return res.status(200).send({ files: files, tags: tags });
+}
+
+export async function uploadBooruFile(req: Request, res: Response) {
+    let data: {
+        url: string,
+    };
+
+    try {
+        data = await booruSchema.validateAsync(req.body);
+    } catch (err: any) {
+        return res.status(400).send(err.details);
+    }
+    const site = await getSite(data.url);
+    console.log(site);
+    if (site == Site.unknown || site == Site.pixiv) return res.status(400).send({ 'error': 'Invalid site' });
+
+    const downloaderService = new DownloaderService();
+    const file = await downloaderService.downloadFileFromService(data.url);
+
+    return res.status(201).send(file);
 }
 
 /*
