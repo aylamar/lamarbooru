@@ -72,7 +72,7 @@
 <style>
     .main-img {
         max-width: calc(100% - 0.5rem);
-        max-height: calc(100vw - 8rem);
+        max-height: calc(100vh - 7rem);
         object-fit: contain;
     }
 </style>
