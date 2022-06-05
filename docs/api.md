@@ -2,52 +2,7 @@
 
 ## File Routes
 
-### GET `/api/file/:id`
-
-_Get file by id._
-
-Parameters:
-
-* `id`: The numerical ID of the file to fetch.
-
-```json title="Successful Reponse (200)"
-{
-    "id": 1,
-    "filename": "c3bb72a9-4cbe-4872-b7b2-bf9e27bfa3e8.jpeg",
-    "createdAt": "2022-05-30T15:52:35.297Z",
-    "updatedAt": "2022-05-30T15:52:35.298Z",
-    "source": {
-        "id": "86739154-6dd0-4e94-b8a8-b623c313228d",
-        "site": "danbooru",
-        "url": "https://www.example.com/image.jpeg",
-        "status": "downloaded"
-    }
-    "approved": true,
-    "rating": "safe",
-    "tags": [
-        {
-            "id": 1,
-            "tag": "1girl",
-            "namespace": "tag",
-            "_count": {
-                "files": 5
-            }
-        },
-        {
-            "id": 2,
-            "tag": "absurdres",
-            "namespace": "meta",
-            "_count": {
-                "files": 4
-            }
-        }
-    ]
-}
-```
-
-Unsuccessful response codes:
-
-* 404: File not found.
+98
 
 ### POST `/api/file`
 
@@ -159,3 +114,187 @@ Unsuccessful response codes:
 
 * 400: Missing required fields or invalid field data.
 * 404: No files found with the parameters provided.
+
+## Subscription Routes
+
+### GET `/api/subscription`
+
+_Get a list of all subscriptions._
+
+```json title="Successful Reponse (200)"
+[
+    {
+        "id": 2,
+        "createdAt": "2022-06-05T02:59:46.851Z",
+        "updatedAt": "2022-06-05T03:00:51.360Z",
+        "site": "danbooru",
+        "tags": [
+            "1girl"
+        ],
+        "tagBlacklist": [],
+        "limit": 500,
+        "status": "finished",
+        "interval": "daily",
+        "nextRun": "2022-06-06T03:00:42.543Z",
+        "_count": {
+            "runs": 5,
+        }
+    },
+    {
+        "id": 1,
+        "createdAt": "2022-06-05T02:08:40.361Z",
+        "updatedAt": "2022-06-05T02:20:06.852Z",
+        "site": "danbooru",
+        "tags": [
+            "mizuhara_chizuru"
+        ],
+        "tagBlacklist": ["comic"],
+        "limit": 200,
+        "status": "finished",
+        "interval": "daily",
+        "nextRun": "2022-06-06T02:17:44.655Z",
+        "_count": {
+            "runs": 1
+        }
+    }
+]
+```
+
+### POST `/api/subscription`
+
+_Create a new subscription._
+
+Parameters:
+
+* `site`: (required) `danbooru`.
+* `tags`: (required) Array of strings containing tags to search.
+* `interval`: (required) `daily`, `weekly`, or `monthly`.
+* `tagBlacklist`: (optional) Array of strings containing tags of images to skip.
+
+```json title="Example request body"
+{
+    "site": "danbooru",
+    "tags": ["mizuha_chizuru"],
+    "tagBlacklist": ["comic"],
+    "interval": "daily"
+}```
+
+
+```json title="Successful Reponse (201)"
+{
+    "id": 1,
+    "createdAt": "2022-06-05T02:59:46.851Z",
+    "updatedAt": "2022-06-05T03:00:51.360Z",
+    "site": "danbooru",
+    "tags": [
+        "mizuhara_chizuru"
+    ],
+    "tagBlacklist": [
+        "comic"
+    ],
+    "limit": 200,
+    "status": "finished",
+    "interval": "daily",
+    "nextRun": "2022-06-06T03:00:42.543Z"
+}
+```
+
+Unsuccessful response codes:
+
+* 400: Missing required fields or invalid field data.
+
+### GET `/api/subscription/:id`
+
+_Get information about a subscription by id._
+
+Parameters:
+
+* `id`: (required) The numerical ID of the file to update.
+
+```json title="Successful Reponse (200)"
+{
+    "id": 1,
+    "createdAt": "2022-06-05T02:08:40.361Z",
+    "updatedAt": "2022-06-05T02:20:06.852Z",
+    "site": "danbooru",
+    "tags": [
+        "mizuhara_chizuru"
+    ],
+    "tagBlacklist": [
+        "comic"
+    ],
+    "limit": 200,
+    "status": "finished",
+    "interval": "daily",
+    "nextRun": "2022-06-06T02:17:44.655Z",
+    "runs": [
+        {
+            "id": 1,
+            "createdAt": "2022-06-05T02:12:04.876Z",
+            "updatedAt": "2022-06-05T02:20:06.843Z",
+            "site": "danbooru",
+            "tags": [
+                "mizuhara_chizuru"
+            ],
+            "status": "finished",
+            "pageNumber": 11,
+            "downloadedUrlCount": 200,
+            "skippedUrlCount": 42,
+            "failedUrlCount": 1,
+            "finished": true,
+            "finishedAt": "2022-06-05T02:20:06.840Z"
+        }
+    ],
+    "_count": {
+        "runs": 1
+    }
+}
+```
+
+Unsuccessful response codes:
+
+* 400: Missing required fields or invalid field data.
+* 404: No run found with matching id.
+
+### GET `/api/subscription/logs/:id`
+
+_Get full logs of a subscription run._
+
+Parameters:
+
+* `id`: (required) The uuid of the run to get the logs of.
+
+```json title="Successful Reponse (200)"
+{
+    "id": 1,
+    "createdAt": "2022-06-05T02:08:40.361Z",
+    "updatedAt": "2022-06-05T02:20:06.852Z",
+    "site": "danbooru",
+    "tags": [
+        "mizuhara_chizuru"
+    ],
+    "tagBlacklist": [
+        "comic"
+    ],
+    "limit": 200,
+    "status": "finished",
+    "interval": "daily",
+    "nextRun": "2022-06-06T02:17:44.655Z",
+    "log": [
+        {
+            "id": "a552ad48-a611-4569-a43a-5bd3d76497ce",
+            "subscriptionRunId": 1,
+            "url": "https://danbooru.donmai.us/posts/000000",
+            "status": "downloaded",
+            "createdAt": "2022-06-05T02:12:06.132Z",
+            "updatedAt": "2022-06-05T02:12:06.133Z"
+        },
+        .... etc ....
+    ]
+}
+```
+
+Unsuccessful response codes:
+
+* 400: Missing required fields or invalid field data.
+* 404: No run found with matching id.
