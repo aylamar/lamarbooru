@@ -1,6 +1,6 @@
 import { Rating, Site } from '@prisma/client';
 import { Request, Response } from 'express';
-import { DownloaderService } from '../../../downloaders/downloader.service';
+import { DownloaderService } from '../../../downloaders/downloader.service.js';
 import {
     checkIfHashExists,
     createFile,
