@@ -2,7 +2,52 @@
 
 ## File Routes
 
-98
+### GET `/api/file/:id`
+
+_Get file by id._
+
+Parameters:
+
+* `id`: The numerical ID of the file to fetch.
+
+```json title="Successful Reponse (200)"
+{
+    "id": 1,
+    "filename": "c3bb72a9-4cbe-4872-b7b2-bf9e27bfa3e8.jpeg",
+    "createdAt": "2022-05-30T15:52:35.297Z",
+    "updatedAt": "2022-05-30T15:52:35.298Z",
+    "source": {
+        "id": "86739154-6dd0-4e94-b8a8-b623c313228d",
+        "site": "danbooru",
+        "url": "https://www.example.com/image.jpeg",
+        "status": "downloaded"
+    }
+    "approved": true,
+    "rating": "safe",
+    "tags": [
+        {
+            "id": 1,
+            "tag": "1girl",
+            "namespace": "tag",
+            "_count": {
+                "files": 5
+            }
+        },
+        {
+            "id": 2,
+            "tag": "absurdres",
+            "namespace": "meta",
+            "_count": {
+                "files": 4
+            }
+        }
+    ]
+}
+```
+
+Unsuccessful response codes:
+
+* 404: File not found.
 
 ### POST `/api/file`
 
