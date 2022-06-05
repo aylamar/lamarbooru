@@ -18,7 +18,7 @@
 
         if (res.ok) {
             file.set(parsedJson);
-            fileUrl.set(`${ import.meta.env.VITE_BASE_URL }public/original/${ parsedJson.filename.substring(0, 2) }/${ parsedJson.filename }`);
+            fileUrl.set(`${ import.meta.env.VITE_BASE_URL }public/files/${ parsedJson.filename.substring(0, 2) }/${ parsedJson.filename }`);
             return { status: 200 };
         }
 

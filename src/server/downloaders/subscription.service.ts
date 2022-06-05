@@ -183,7 +183,7 @@ export class SubscriptionsService {
 
         for (const sub of waitingSubs) {
             console.log(`Starting ${ sub.tags.join(' ') } on ${ sub.site }.`);
-            this.subscriptionRunner(sub).then(() => {
+            await this.subscriptionRunner(sub).then(() => {
                 console.log(`Finished ${ sub.tags.join(' ') } on ${ sub.site }.`);
             });
         }

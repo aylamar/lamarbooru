@@ -3,10 +3,9 @@ import crypto from 'crypto';
 import fs from 'fs';
 import sharp from 'sharp';
 import { v4 as uuid } from 'uuid';
+import { fileBasePath, thumbnailBasePath } from '../server.js';
 import prisma from './prisma.js';
 
-const fileBasePath = './public/original';
-const thumbnailBasePath = './public/thumbnail';
 const allowedExtensions = ['png', 'jpg', 'jpeg'];
 
 /*

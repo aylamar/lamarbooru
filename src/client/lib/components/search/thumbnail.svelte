@@ -8,7 +8,7 @@
         // get first two characters of file name
         const firstTwoChars = fileName.substring(0, 2);
         // img url = first two characters of file name/file name
-        return `${ import.meta.env.VITE_BASE_URL }public/thumbnail/${ firstTwoChars }/${ fileName }`;
+        return `${ import.meta.env.VITE_BASE_URL }public/thumbs/${ firstTwoChars }/${ fileName }`;
     }
 </script>
 
@@ -18,7 +18,7 @@
     </a>
     {#if approved === false}
         <div>
-            <!--             @@TODO on click, approve image or unapprove once clicked again -->
+            <!-- @@TODO on click, approve image or unapprove once clicked again -->
             <span class="absolute top-3 right-3">
                 <svg width="24px" height="24px" viewBox="0 0 128 128" class="drop-shadow-lg" transition:fade>
                     <path fill="#A7B9D1"
