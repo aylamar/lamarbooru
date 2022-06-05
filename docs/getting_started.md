@@ -9,6 +9,8 @@ Eventually, the goal is to provide a docker image for easy setup/installation.
 * `PORT`: Port to run the webserver.
 * `DATABASE_URL`: Postgres connection string.
 * `VITE_BASE_URL`: Base URL for webserver, should be `https://localhost:3000/` for development.
+* `FILES_DIRECTORY`: Location on disk to store uploaded files. 
+* `THUMBNAILS_DIRECTORY`: Location on disk to store generated thumbnails.
 
 
 ### Example .env file
@@ -17,6 +19,8 @@ Eventually, the goal is to provide a docker image for easy setup/installation.
 PORT=3000
 DATABASE_URL="postgresql://postgres:very_secure_password_that_you_should_probably_change@localhost:5432/postgres?schema=postgres"
 VITE_BASE_URL=http://localhost:3000/
+FILES_DIRECTORY="/Lamarbooru/files"
+THUMBNAILS_DIRECTORY="/Lamarbooru/thumbnails"
 ```
 
 ## Setup Process
