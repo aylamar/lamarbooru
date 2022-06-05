@@ -229,14 +229,7 @@ export async function updateFile(id: number, dataPayload: dataPayload) {
     return await prisma.file.update({
         where: { id: id },
         data: dataPayload,
-        select: {
-            id: true,
-            filename: true,
-            createdAt: true,
-            updatedAt: true,
-            source: true,
-            approved: true,
-            rating: true,
+        include: {
             tags: {
                 select: {
                     id: true,

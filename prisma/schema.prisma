@@ -15,12 +15,12 @@ model File {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   filename  String   @unique
-
-  hash     String  @unique
-  tags     Tag[]
-  source   Url[]
-  rating   Rating  @default(explicit)
-  approved Boolean @default(false)
+  hash      String   @unique
+  tags      Tag[]
+  source    Url[]
+  deleted   Boolean  @default(false)
+  rating    Rating   @default(explicit)
+  approved  Boolean  @default(false)
 
   @@map("files")
 }

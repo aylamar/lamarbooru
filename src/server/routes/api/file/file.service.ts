@@ -212,14 +212,7 @@ async function getFileById(id: number) {
     return await prisma.file.findUnique({
         where: {
             id: id,
-        }, select: {
-            id: true,
-            filename: true,
-            createdAt: true,
-            updatedAt: true,
-            source: true,
-            approved: true,
-            rating: true,
+        }, include: {
             tags: {
                 select: {
                     id: true,
@@ -243,6 +236,7 @@ async function searchImages(idx: number, tags?: string[]) {
         return await prisma.file.findMany({
             where: {
                 tags: { some: { tag: { in: tags } } },
+                deleted: false,
             },
             orderBy: {
                 id: 'desc',
@@ -261,6 +255,9 @@ async function searchImages(idx: number, tags?: string[]) {
         });
     } else {
         return await prisma.file.findMany({
+            where: {
+                deleted: false,
+            },
             orderBy: {
                 id: 'desc',
             },
