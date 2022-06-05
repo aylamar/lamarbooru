@@ -13,17 +13,19 @@ Parameters:
 ```json title="Successful Reponse (200)"
 {
     "id": 1,
-    "filename": "c3bb72a9-4cbe-4872-b7b2-bf9e27bfa3e8.jpeg",
     "createdAt": "2022-05-30T15:52:35.297Z",
     "updatedAt": "2022-05-30T15:52:35.298Z",
+    "filename": "c3bb72a9-4cbe-4872-b7b2-bf9e27bfa3e8.jpeg",
+    "hash": "85747e8865a35c3f44a1e5596b36f79d",
+    "deleted": false,
+    "approved": true,
+    "rating": "safe",
     "source": {
         "id": "86739154-6dd0-4e94-b8a8-b623c313228d",
         "site": "danbooru",
         "url": "https://www.example.com/image.jpeg",
         "status": "downloaded"
     }
-    "approved": true,
-    "rating": "safe",
     "tags": [
         {
             "id": 1,
@@ -171,10 +173,33 @@ Parameters:
 ]
 ```
 
+### GET `/api/file/tags/:tag`
+
+_Get all tags that start with the :tag parameter_
+
+Parameters:
+
+* `tag`: (required) Tag to search for.
+
+```json title="Successful Reponse (200)"
+[
+    {
+        "id": 4,
+        "tag": "1girl",
+        "namespace": "tag"
+    },
+    {
+        "id": 1389,
+        "tag": "1boy",
+        "namespace": "tag"
+    }
+]
+```
+
+
 Unsuccessful response codes:
 
-* 400: Missing required fields or invalid field data.
-* 404: No files found with the parameters provided.
+* 404: No tags found with the parameters provided.
 
 ## Subscription Routes
 
