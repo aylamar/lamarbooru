@@ -44,12 +44,18 @@
     <div class="text-xl font-bold">
         <h3>Tags</h3>
     </div>
-    <ul>
+    <ul class="xs">
         {#each processedTags as tag}
             <li>
-                <a href="/files/?tags={tag.tag}" class={tag.color}>{tag.tag}</a> <span
+                <a href="/files/?tags={tag.tag}" class={tag.color}>{tag.tag.replace(/_/g, ' ')}</a> <span
                     class="text-slate-500">{tag.count}</span>
             </li>
         {/each}
     </ul>
 </div>
+
+<style>
+    .xs {
+        max-width: 15rem;
+    }
+</style>

@@ -9,13 +9,19 @@
 <div class="tags pb-2">
     <div>
         <p class="text-xl font-bold">{header}</p>
-        <ul>
+        <ul class="xs">
             {#each tags as tag}
                 <li>
-                    <a href="/files/?tags={tag.tag}" class={fontColor}>{tag.tag}</a>
-                    <span class="text-slate-500 break-all">{tag._count.files}</span>
+                    <a href="/files/?tags={tag.tag}" class="{fontColor} break-words">{tag.tag.replace(/_/g, ' ')}</a>
+                    <span class="text-slate-500">{tag._count.files}</span>
                 </li>
             {/each}
         </ul>
     </div>
 </div>
+
+<style>
+    .xs {
+        max-width: 15rem;
+    }
+</style>
