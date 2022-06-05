@@ -4,9 +4,11 @@ import { DownloaderService } from './downloader.service.js';
 
 export class SubscriptionsService {
     private downloaderService: DownloaderService;
+    private isRunning: boolean
 
     constructor() {
         this.downloaderService = new DownloaderService();
+        this.isRunning = false;
         // start subscriptions that were running when server was shut off
         void this.init();
 
@@ -171,9 +173,13 @@ export class SubscriptionsService {
             }
             await this.subscriptionRunner(sub, run);
         }
+        this.isRunning = false;
     }
 
     private async runWaitingSubscriptions() {
+        if (this.isRunning) return;
+        this.isRunning = true;
+
         console.log('Checking for waiting subscriptions...');
         const waitingSubs = await SubscriptionsService.getWaitingSubscriptions();
         if (waitingSubs.length === 0) {
@@ -187,6 +193,8 @@ export class SubscriptionsService {
                 console.log(`Finished ${ sub.tags.join(' ') } on ${ sub.site }.`);
             });
         }
+
+        this.isRunning = false;
     }
 
     private async processSubscription(run: SubscriptionRun, limit: number, blacklist: string[]) {
