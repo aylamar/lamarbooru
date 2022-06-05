@@ -106,7 +106,7 @@ export default class DanbooruService {
         return [url];
     }
 
-    public async getImageUrl(payload: danbooruImage): Promise<string> {
+    public async getFileUrl(payload: danbooruImage): Promise<string> {
         return payload.file_url;
     }
 }

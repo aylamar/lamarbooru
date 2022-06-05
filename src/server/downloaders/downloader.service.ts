@@ -14,7 +14,7 @@ import {
 } from '../utils/fileUtils.js';
 import DanbooruService from './sites/danbooru.js';
 
-export class ImageService {
+export class DownloaderService {
     private readonly danbooru: DanbooruService;
 
     constructor() {
@@ -46,24 +46,24 @@ export class ImageService {
         return cleanedUrl;
     }
 
-    private static async downloadImage(url: string) {
+    private static async downloadFile(url: string) {
         // return file in buffer
         const res = await fetch(url);
         if (res.ok) {
             return await res.buffer();
         } else {
-            throw new Error('Could not download image');
+            throw new Error('Could not download file');
         }
     }
 
-    public async downloadImageFromService(inputUrl: string, blacklist?: string[]): Promise<FileMeta> {
-        const url = ImageService.cleanUrl(inputUrl);
+    public async downloadFileFromService(inputUrl: string, blacklist?: string[]): Promise<FileMeta> {
+        const url = DownloaderService.cleanUrl(inputUrl);
         const service = await this.getServiceFromURL(url);
 
         const $ = await service.getPageData(url);
-        const imageUrl = await service.getImageUrl($);
+        const fileUrl = await service.getFileUrl($);
 
-        const fileExtension = await getFileExtensionFromURL(imageUrl);
+        const fileExtension = await getFileExtensionFromURL(fileUrl);
         if (!fileExtension) throw Error('Unsupported Media Type');
 
         const valid = await isValidExtension(fileExtension);
@@ -95,8 +95,8 @@ export class ImageService {
 
         // Generate everything needed for adding to database
         const connectQuery = await generateTagConnectQuery(combined);
-        const imageBuffer = await ImageService.downloadImage(imageUrl);
-        const hash = await getFileHash(imageBuffer);
+        const fileBuffer = await DownloaderService.downloadFile(fileUrl);
+        const hash = await getFileHash(fileBuffer);
         const fileName = await generateFileName(fileExtension);
 
         // check to see if hash already exists
@@ -104,10 +104,10 @@ export class ImageService {
         if (exists) return { file: exists, status: 'exists' };
 
         // Add to database and write to disk
-        const image = await createFile(fileName, hash, connectQuery, source, rating);
-        await writeFile(imageBuffer, fileName);
+        const file = await createFile(fileName, hash, connectQuery, source, rating);
+        await writeFile(fileBuffer, fileName);
 
-        return { file: image, status: 'success' };
+        return { file: file, status: 'success' };
     }
 
     public async exploreGallery(site: Site, tags: string[], pageNumber: number) {

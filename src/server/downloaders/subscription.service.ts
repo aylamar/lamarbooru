@@ -1,12 +1,12 @@
 import { Interval, Site, Subscription, SubscriptionRun, SubscriptionStatus, UrlStatus } from '@prisma/client';
 import prisma from '../utils/prisma.js';
-import { ImageService } from './image.service.js';
+import { DownloaderService } from './downloader.service.js';
 
 export class SubscriptionsService {
-    private imageService: ImageService;
+    private downloaderService: DownloaderService;
 
     constructor() {
-        this.imageService = new ImageService();
+        this.downloaderService = new DownloaderService();
         // start subscriptions that were running when server was shut off
         void this.init();
 
@@ -196,9 +196,9 @@ export class SubscriptionsService {
         while (keepRunning) {
             // update page number
             run = await SubscriptionsService.updateRunPage(run, run.pageNumber);
-            const gallery = await this.imageService.exploreGallery(run.site, run.tags, run.pageNumber);
+            const gallery = await this.downloaderService.exploreGallery(run.site, run.tags, run.pageNumber);
 
-            // finish run if no images found
+            // finish run if no files found
             if (gallery.length === 0) {
                 keepRunning = false;
                 break;
@@ -223,11 +223,11 @@ export class SubscriptionsService {
                     continue;
                 }
 
-                // download image
+                // download file
                 try {
-                    const image = await this.imageService.downloadImageFromService(url, blacklist);
-                    prevImg = image.status;
-                    switch (image.status) {
+                    const file = await this.downloaderService.downloadFileFromService(url, blacklist);
+                    prevImg = file.status;
+                    switch (file.status) {
                         case 'success':
                             run = await SubscriptionsService.updateRunCounts(run, url, UrlStatus.downloaded);
                             break;

@@ -33,7 +33,7 @@ describe('ImageService', () => {
         expect(await service.getTags(data)).toContain('bangs');
         expect(await service.getMeta(data)).toContain('meta:absurdres');
         expect(await service.getSource(data, url)).toEqual(['https://www.pixiv.net/artworks/68428489', url]);
-        expect(await service.getImageUrl(data)).toContain('https://cdn.donmai.us/original/b7/81/b781170a27fe53004decf02dd308d38b.jpg');
+        expect(await service.getFileUrl(data)).toContain('https://cdn.donmai.us/original/b7/81/b781170a27fe53004decf02dd308d38b.jpg');
     });
 
     it('should return the correct data for post two', async () => {
@@ -45,7 +45,7 @@ describe('ImageService', () => {
         expect(await service.getTags(data)).toContain('1girl');
         expect(await service.getTags(data)).toContain('1boy');
         expect(await service.getSource(data, url)).toEqual(['https://twitter.com/miyajimareiji/status/1369181015504130050', url]);
-        expect(await service.getImageUrl(data)).toEqual('https://cdn.donmai.us/original/27/f7/27f79d5fd52cf77f9d608e6baa083c3c.jpg');
+        expect(await service.getFileUrl(data)).toEqual('https://cdn.donmai.us/original/27/f7/27f79d5fd52cf77f9d608e6baa083c3c.jpg');
     });
 
     it('should generate the correct number of urls', async () => {
