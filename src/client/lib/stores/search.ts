@@ -7,7 +7,7 @@ type Params = {
 }
 
 export const params = writable<Params>({
-    searchParams: "",
+    searchParams: '',
     idx: 1,
 });
 
@@ -18,9 +18,9 @@ type tagData = {
     accumulator: number,
 }
 export const derivedParams = derived(params, (params) => {
-    if (params.searchParams == null) return ""
-    return params.searchParams.replace(/\s/g, "+");
-})
+    if (params.searchParams == null) return '';
+    return params.searchParams.replace(/\s/g, '+');
+});
 
 export const files = writable<File[]>([]);
 
@@ -33,7 +33,7 @@ export const derivedTags = derived(files, (files) => {
         tags = tags.concat(...file.tags);
     });
 
-    let tagsWithData: tagData[] = []
+    let tagsWithData: tagData[] = [];
     // get tag count for each tag in files
     for (const tag of tags) {
         // if tag.tag is not in tagsWithData, add it
@@ -43,19 +43,21 @@ export const derivedTags = derived(files, (files) => {
                 //@ts-ignore
                 _count: tag._count,
                 namespace: tag.namespace,
-                accumulator: 1
-            })
+                accumulator: 1,
+            });
         } else {
             // increase accumulator of tag
-            const tagIndex = tagsWithData.findIndex(t => t.tag === tag.tag)
-            tagsWithData[tagIndex].accumulator++
+            const tagIndex = tagsWithData.findIndex(t => t.tag === tag.tag);
+            tagsWithData[tagIndex].accumulator++;
         }
     }
 
     // sort tags by accumulator
-    tagsWithData = tagsWithData.sort((a, b) => b.accumulator - a.accumulator)
+    tagsWithData = tagsWithData.sort((a, b) => b.accumulator - a.accumulator);
     // get top 20 tags
-    tagsWithData = tagsWithData.slice(0, 20)
+    tagsWithData = tagsWithData.slice(0, 20);
 
     return tagsWithData;
-})
+});
+
+export const tags = writable<Tag[]>([]);
