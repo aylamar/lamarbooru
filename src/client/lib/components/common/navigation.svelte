@@ -7,6 +7,7 @@
         <a class="text-3xl font-bold" href="/">Lamarbooru</a>
         <div class="sm:flex space-x-3">
             <a class="" href="/files">Files</a>
+            <a class="" href="/subscriptions">Subscriptions</a>
             <a class="" href="/uploads/new">Upload</a>
         </div>
     </nav>
