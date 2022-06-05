@@ -19,7 +19,7 @@ import {
     writeFile,
 } from '../../../utils/fileUtils.js';
 import prisma from '../../../utils/prisma.js';
-import { booruSchema, fileSchema, idSchema, tagSchema } from './file.validation.js';
+import { booruSchema, fileSchema, idSchema, tagSchema, tagsSchema } from './file.validation.js';
 
 export async function uploadFileHandler(req: Request, res: Response) {
     let data: {
@@ -138,7 +138,7 @@ export async function searchFileHandler(req: Request, res: Response) {
     let tagData: { tags?: string };
     try {
         data = await idSchema.validateAsync(req.params);
-        tagData = await tagSchema.validateAsync(req.query);
+        tagData = await tagsSchema.validateAsync(req.query);
     } catch (err: any) {
         return res.status(400).send(err.details);
     }
@@ -177,6 +177,24 @@ export async function uploadBooruFile(req: Request, res: Response) {
     const file = await downloaderService.downloadFileFromService(data.url);
 
     return res.status(201).send(file);
+}
+
+export async function tagSearchHandler(req: Request, res: Response) {
+    let tagData: { tag: string };
+    try {
+        tagData = await tagSchema.validateAsync(req.params);
+    } catch (err: any) {
+        return res.status(400).send(err.details);
+    }
+
+    const tags = await prisma.tag.findMany({
+        where: {
+            tag: {
+                startsWith: tagData.tag,
+            },
+        },
+    });
+    res.send(tags);
 }
 
 /*

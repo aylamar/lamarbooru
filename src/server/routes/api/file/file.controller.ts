@@ -4,6 +4,7 @@ import {
     getFileHandler,
     getFileStats,
     searchFileHandler,
+    tagSearchHandler,
     updateFileHandler,
     uploadBooruFile,
     uploadFileHandler,
@@ -26,5 +27,7 @@ router.put('/:id', updateFileHandler);
 router.get('/search/:id/', searchFileHandler);
 // PUT /api/file/booru to upload a file from booru
 router.post('/booru', uploadBooruFile);
+// GET /api/file/tags/:tag to get a list of tags starting with :tag
+router.get('/tags/:tag', tagSearchHandler);
 
 export default router;

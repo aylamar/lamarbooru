@@ -10,8 +10,12 @@ export const idSchema = Joi.object({
     id: Joi.number().integer().min(1).required(),
 });
 
-export const tagSchema = Joi.object({
+export const tagsSchema = Joi.object({
     tags: Joi.string().lowercase().optional(),
+});
+
+export const tagSchema = Joi.object({
+    tag: Joi.string().lowercase().required(),
 });
 
 export const booruSchema = Joi.object({
