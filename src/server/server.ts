@@ -1,8 +1,9 @@
 import cors from 'cors';
 import express from 'express';
-import routeController from './routes/route.controller.js';
 //@ts-ignore
 import { handler } from '../client/handler.js';
+import { SubscriptionsService } from './downloaders/subscription.service.js';
+import routeController from './routes/route.controller.js';
 
 const server = express();
 const port = process.env.PORT || 3000;
@@ -24,6 +25,8 @@ server.use(routeController);
 // initialize svelte-kit
 server.use(handler);
 
+// start subscription service
+const subscriptionService = new SubscriptionsService();
 
 server.listen(port);
 console.log(`Server listening on port ${ port }`);

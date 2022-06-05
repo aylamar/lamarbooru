@@ -16,11 +16,11 @@ model File {
   updatedAt DateTime @updatedAt
   filename  String   @unique
 
-  hash       String   @unique
-  tags       Tag[]
-  source     Url[]
-  rating     Rating   @default(explicit)
-  approved   Boolean  @default(false)
+  hash     String  @unique
+  tags     Tag[]
+  source   Url[]
+  rating   Rating  @default(explicit)
+  approved Boolean @default(false)
 
   @@map("files")
 }
@@ -36,13 +36,61 @@ model Tag {
 }
 
 model Url {
-  id                String       @id @unique @default(uuid())
-  site              Site
-  url               String
-  status            UrlStatus    @default(downloaded)
-  File              File[]
+  id     String    @id @unique @default(uuid())
+  site   Site
+  url    String
+  status UrlStatus @default(downloaded)
+  File   File[]
+
   @@unique([site, url])
   @@map("urls")
+}
+
+model Subscription {
+  id           Int                @id @default(autoincrement())
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  site         Site
+  tags         String[]
+  tagBlacklist String[]
+  limit        Int                @default(200)
+  status       SubscriptionStatus @default(active)
+  interval     Interval           @default(daily)
+  runs         SubscriptionRun[]
+  nextRun      DateTime?          @default(now())
+
+  @@unique(id)
+  @@unique([site, tags])
+  @@map("subscriptions")
+}
+
+model SubscriptionRun {
+  id                 Int                @id @unique @default(autoincrement())
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  subscription       Subscription       @relation(fields: [site, tags], references: [site, tags])
+  site               Site
+  tags               String[]
+  status             SubscriptionStatus @default(running)
+  log                SubscriptionLog[]
+  pageNumber         Int                @default(1)
+  downloadedUrlCount Int                @default(0)
+  skippedUrlCount    Int                @default(0)
+  failedUrlCount     Int                @default(0)
+  finished           Boolean            @default(false)
+  finishedAt         DateTime?
+
+  @@map("runs")
+}
+
+model SubscriptionLog {
+  id                String           @id @unique @default(uuid())
+  subscriptionRun   SubscriptionRun? @relation(fields: [subscriptionRunId], references: [id])
+  subscriptionRunId Int?
+  url               String
+  status            UrlStatus
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
 }
 
 enum UrlStatus {
@@ -50,6 +98,8 @@ enum UrlStatus {
   skipped
   failed
   deleted
+  exists
+  blacklisted
 }
 
 enum Site {
@@ -70,4 +120,17 @@ enum Rating {
   safe
   questionable
   explicit
+}
+
+enum Interval {
+  daily
+  weekly
+  monthly
+}
+
+enum SubscriptionStatus {
+  active
+  running
+  paused
+  finished
 }
