@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import {
     getLogsByIdHandler,
-    getRunsByTagsHandler,
     getSubscriptionAllHandler,
     getSubscriptionByIdHandler,
     newSubscriptionHandler,
@@ -11,7 +10,6 @@ let router = Router();
 
 router.get('/', getSubscriptionAllHandler);
 router.post('/', newSubscriptionHandler);
-router.get('/runs', getRunsByTagsHandler);
 router.get('/logs/:id', getLogsByIdHandler);
 router.get('/:id', getSubscriptionByIdHandler);
 

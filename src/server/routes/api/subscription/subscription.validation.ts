@@ -12,11 +12,6 @@ export const subscriptionIdSchema = Joi.object({
     id: Joi.number().min(1).required(),
 });
 
-export const logSchema = Joi.object({
-    site: Joi.string().lowercase().valid('danbooru').required(),
-    tags: Joi.array().items(Joi.string().lowercase()).min(1).max(2).required(),
-});
-
 export const logIdSchema = Joi.object({
     id: Joi.number().min(1).required(),
 });

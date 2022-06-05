@@ -1,7 +1,7 @@
 import { Interval, Site } from '@prisma/client';
 import { Request, Response } from 'express';
 import prisma from '../../../utils/prisma.js';
-import { logIdSchema, logSchema, newSubscriptionSchema, subscriptionIdSchema } from './subscription.validation.js';
+import { logIdSchema, newSubscriptionSchema, subscriptionIdSchema } from './subscription.validation.js';
 
 interface newSubscriptionPayload {
     site: Site;
@@ -95,33 +95,6 @@ export async function getSubscriptionByIdHandler(req: Request, res: Response) {
 
     if (!subscription) return res.status(404).send({ 'error': 'Subscription not found' });
     res.send(subscription);
-}
-
-export async function getRunsByTagsHandler(req: Request, res: Response) {
-    let data: {
-        site: string;
-        tags: string[];
-    };
-    try {
-        data = await logSchema.validateAsync(req.body);
-    } catch (err: any) {
-        return res.status(400).send(err.details);
-    }
-
-    const runs = await prisma.subscriptionRun.findMany({
-        where: {
-            AND: [
-                { tags: { hasEvery: data.tags } },
-                { site: await getSite(data.site) },
-            ],
-        },
-        orderBy: {
-            createdAt: 'desc',
-        },
-    });
-
-    if (!runs) return res.status(404).send({ 'error': 'No runs found' });
-    res.send(runs);
 }
 
 export async function getLogsByIdHandler(req: Request, res: Response) {
