@@ -43,7 +43,7 @@ export async function newSubscriptionHandler(req: Request, res: Response) {
             ],
         },
     });
-    if (subscription) return res.send(subscription);
+    if (subscription) return res.status(200).send(subscription);
 
     // create subscription if one doesn't exist
     const newSubscription = await prisma.subscription.create({
@@ -51,7 +51,7 @@ export async function newSubscriptionHandler(req: Request, res: Response) {
     });
 
     if (!newSubscription) return res.status(500).send({ 'error': 'Subscription not created' });
-    return res.send(newSubscription);
+    return res.status(201).send(newSubscription);
 }
 
 export async function getSubscriptionAllHandler(req: Request, res: Response) {
