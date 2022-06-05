@@ -132,6 +132,22 @@ Unsuccessful response codes:
 * 404: No file found with that id.
 * 500: Database error while updating file.
 
+### POST `/api/file/booru`
+
+_Add a new file to the database using data from a booru._
+
+Arguments:
+
+* `url`: (required) The url of the file to upload.
+
+```json title="Successful Reponse (201)"
+{
+    "id": 1,
+    ... full file data ...
+}
+```
+
+
 ### GET `/api/file/search/:page`
 
 _Get a page of 32 files using, optionally filtered by tag_
