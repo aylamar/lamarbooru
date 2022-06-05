@@ -1,8 +1,7 @@
 # Lamarbooru
 
+Lamarbooru is a media management system that is heavily inspired by [Hydrus](https://github.com/hydrusnetwork/hydrus).
+
+## Helpful Links
+
 * [Documentation](https://aylamar.github.io/lamarbooru/)
-
-## Environment Variables
-
-- PORT = port to run webserver on, defaults to 3000
-- DATABASE_URL = postgres url
