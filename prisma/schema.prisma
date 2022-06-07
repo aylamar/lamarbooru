@@ -11,16 +11,15 @@ datasource db {
 }
 
 model File {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  filename  String   @unique
-  hash      String   @unique
+  id        Int        @id @default(autoincrement())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  filename  String     @unique
+  hash      String     @unique
   tags      Tag[]
   source    Url[]
-  deleted   Boolean  @default(false)
-  rating    Rating   @default(explicit)
-  approved  Boolean  @default(false)
+  status    FileStatus @default(inbox)
+  rating    Rating     @default(explicit)
 
   @@map("files")
 }
@@ -91,6 +90,12 @@ model SubscriptionLog {
   status            UrlStatus
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
+}
+
+enum FileStatus {
+  archived
+  inbox
+  deleted
 }
 
 enum UrlStatus {

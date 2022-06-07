@@ -10,7 +10,7 @@
             <li>Upload Date: {$file.updatedAt.split('T')[0].replace('-', '/').replace('-', '/')}</li>
         {/if}
         <li>Rating: {$file.rating[0].toUpperCase() + $file.rating.slice(1)}</li>
-        <li>Approved: {$file.approved.toString()}</li>
+        <li>Status: {$file.status.toString()}</li>
         {#if $file.source}
             <li>Sources:</li>
             {#each $file.source as source}

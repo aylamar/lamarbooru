@@ -22,7 +22,7 @@ export type File = {
     createdAt: string;
     updatedAt: string;
     source: Source[];
-    approved: boolean;
+    status: string;
     rating: string;
     uploader: { username: string };
     tags: Tag[];

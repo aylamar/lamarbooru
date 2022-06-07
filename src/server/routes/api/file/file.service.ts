@@ -1,4 +1,4 @@
-import { Rating, Site } from '@prisma/client';
+import { Rating, Site, FileStatus } from '@prisma/client';
 import { Request, Response } from 'express';
 import { DownloaderService } from '../../../downloaders/downloader.service.js';
 import {
@@ -236,7 +236,9 @@ async function searchImages(idx: number, tags?: string[]) {
         return await prisma.file.findMany({
             where: {
                 tags: { some: { tag: { in: tags } } },
-                deleted: false,
+                NOT: {
+                    status: FileStatus.deleted,
+                }
             },
             orderBy: {
                 id: 'desc',
@@ -256,7 +258,9 @@ async function searchImages(idx: number, tags?: string[]) {
     } else {
         return await prisma.file.findMany({
             where: {
-                deleted: false,
+                NOT: {
+                    status: FileStatus.deleted,
+                }
             },
             orderBy: {
                 id: 'desc',
