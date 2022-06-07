@@ -17,7 +17,7 @@ model File {
   filename  String     @unique
   hash      String     @unique
   tags      Tag[]
-  source    Url[]
+  sources   Url[]
   status    FileStatus @default(inbox)
   rating    Rating     @default(explicit)
 
@@ -41,7 +41,7 @@ model Url {
   status UrlStatus @default(downloaded)
   File   File[]
 
-  @@unique([site, url])
+  @@unique([url])
   @@map("urls")
 }
 

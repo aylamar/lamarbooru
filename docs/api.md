@@ -19,7 +19,7 @@ Parameters:
     "hash": "85747e8865a35c3f44a1e5596b36f79d",
     "status": "inbox",
     "rating": "safe",
-    "source": {
+    "sources": {
         "id": "86739154-6dd0-4e94-b8a8-b623c313228d",
         "site": "danbooru",
         "url": "https://www.example.com/image.jpeg",
@@ -59,12 +59,12 @@ Arguments:
 * `file`: (required) The file to upload.
 * `tags`:  (required) Array of strings containing tags.
 * `rating`: (optional) The rating of the file (must be safe, questionable, or explicit), defaults to explicit.
-* `source`: (optional) Sources of file in an array of strings.
+* `sources`: (optional) Sources of file in an array of strings.
 
 ```json title="Example request body"
 {
     "tags": ["meta:absurdres", "1girl", "creator:yom"],
-    "source": ["https://www.example.com/image.jpeg"],
+    "sources": ["https://www.example.com/image.jpeg"],
     "rating": "safe",
 }
 ```
@@ -102,7 +102,7 @@ Arguments:
 
 * `tags`:  (required) Array of strings containing tags.
 * `rating`: (optional) The rating of the file (must be safe, questionable, or explicit).
-* `source`: (optional) Sources of file in an array of strings.
+* `sources`: (optional) Sources of file in an array of strings.
 
 ```json title="Example request body"
 {
@@ -112,7 +112,7 @@ Arguments:
         "1girl",
         "1boy"
     ],
-    "source": [
+    "sources": [
         "https://www.example.com/example.jpg"
     ],
     "rating": "safe" 

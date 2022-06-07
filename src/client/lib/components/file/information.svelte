@@ -11,9 +11,9 @@
         {/if}
         <li>Rating: {$file.rating[0].toUpperCase() + $file.rating.slice(1)}</li>
         <li>Status: {$file.status.toString()}</li>
-        {#if $file.source}
+        {#if $file.sources}
             <li>Sources:</li>
-            {#each $file.source as source}
+            {#each $file.sources as source}
                 <li class="break-words"><a class="text-blue-400"
                                            href={source.url}>{source.site}</a>
             {/each}

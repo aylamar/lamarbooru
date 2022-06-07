@@ -1,4 +1,4 @@
-import { File, Namespace, Rating, Site } from '@prisma/client';
+import { File, Namespace, Rating, Site, UrlStatus } from '@prisma/client';
 import crypto from 'crypto';
 import fs from 'fs';
 import sharp from 'sharp';
@@ -19,6 +19,7 @@ export async function checkIfHashExists(hash: string) {
             hash: hash,
         }, include: {
             tags: true,
+            sources: true,
         },
 
     });
@@ -52,13 +53,14 @@ export async function createFile(fileName: string, hash: string, connectQuery: t
 
     return await prisma.file.create({
         data: {
-            filename: fileName, hash: hash, rating: rating, source: { connectOrCreate: source },
+            filename: fileName, hash: hash, rating: rating, sources: { connectOrCreate: source },
             tags: {
                 connectOrCreate: connectQuery,
             },
         },
         include: {
             tags: true,
+            sources: true,
         },
     });
 }
@@ -112,12 +114,30 @@ export async function generateUrlConnectQuery(urls: string[]): Promise<urlConnec
     @param fileTags: Array of tags of the file
     @returns Array of disconnect queries for tags missing from fileTags
  */
-export async function generateTagDisconnectQuery(tags: string[], fileTags: tags[]): Promise<tagDisconnectQuery[]> {
+export async function generateTagDisconnectQuery(tags: string[], fileTags: tag[]): Promise<tagDisconnectQuery[]> {
     let disconnectQuery: tagDisconnectQuery[] = [];
     for (const i in fileTags) {
         if (!tags.includes(fileTags[i].tag)) {
             disconnectQuery.push({
                 id: fileTags[i].id,
+            });
+        }
+    }
+    return disconnectQuery;
+}
+
+/*
+    Generates a disconnect query for a source list of strings
+    @param tags: Array of sources to compare against
+    @param fileTags: Array of sources of the file
+    @returns Array of disconnect queries for tags missing from fileTags
+ */
+export async function generateSourceDisconnectQuery(sources: string[], fileSources: source[]): Promise<urlDisconnectQuery[]> {
+    let disconnectQuery: urlDisconnectQuery[] = [];
+    for (const i in fileSources) {
+        if (!sources.includes(fileSources[i].url)) {
+            disconnectQuery.push({
+                id: fileSources[i].id,
             });
         }
     }
@@ -255,6 +275,15 @@ export async function updateFile(id: number, dataPayload: dataPayload) {
                     _count: true,
                 },
             },
+            sources: {
+                select: {
+                    id: true,
+                    url: true,
+                    site: true,
+                    status: true,
+                    _count: true,
+                }
+            }
         },
     });
 }
@@ -287,12 +316,12 @@ export interface urlConnectQuery {
 }
 
 export interface urlDisconnectQuery {
-    url: string,
+    id: string,
 }
 
 export interface dataPayload {
     rating?: Rating,
-    source?: {
+    sources?: {
         connectOrCreate: urlConnectQuery[],
         disconnect: urlDisconnectQuery[],
     },
@@ -302,8 +331,15 @@ export interface dataPayload {
     }
 }
 
-export interface tags {
+interface tag {
     id: number,
     tag: string,
     namespace: Namespace
+}
+
+interface source {
+    id: string,
+    site: Site,
+    url: string,
+    status: UrlStatus,
 }

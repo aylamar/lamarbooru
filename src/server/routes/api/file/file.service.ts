@@ -5,7 +5,7 @@ import {
     checkIfHashExists,
     createFile,
     dataPayload,
-    generateFileName,
+    generateFileName, generateSourceDisconnectQuery,
     generateTagConnectQuery,
     generateTagDisconnectQuery,
     generateUrlConnectQuery,
@@ -16,7 +16,7 @@ import {
     isValidMimeType,
     tagConnectQuery,
     tagDisconnectQuery,
-    updateFile,
+    updateFile, urlConnectQuery, urlDisconnectQuery,
     writeFile,
 } from '../../../utils/fileUtils.js';
 import prisma from '../../../utils/prisma.js';
@@ -104,17 +104,17 @@ export async function updateFileHandler(req: Request, res: Response) {
     }
 
     // Remove any tags that are no longer in use
-    let disconnectQuery: tagDisconnectQuery[] = await generateTagDisconnectQuery(tags, file.tags);
-
-    // Add new tags that are in use
+    const disconnectQuery: tagDisconnectQuery[] = await generateTagDisconnectQuery(tags, file.tags);
     const tagConnectQuery: tagConnectQuery[] = await generateTagConnectQuery(tags);
 
     if (!source) source = [];
-    const urlConnectQuery = await generateUrlConnectQuery(source);
+    const urlConnectQuery: urlConnectQuery[] = await generateUrlConnectQuery(source);
+    const urlDisconnectQuery: urlDisconnectQuery[] = await generateSourceDisconnectQuery(source, file.sources);
+
     let dataPayload: dataPayload = {
-        source: {
+        sources: {
             connectOrCreate: urlConnectQuery,
-            disconnect: [],
+            disconnect: urlDisconnectQuery,
         },
         tags: {
             connectOrCreate: tagConnectQuery,
@@ -217,6 +217,15 @@ async function getFileById(id: number) {
                     _count: true,
                 },
             },
+            sources: {
+                select: {
+                    id: true,
+                    url: true,
+                    site: true,
+                    status: true,
+                    _count: true,
+                }
+            }
         },
     });
 }

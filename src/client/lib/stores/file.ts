@@ -21,7 +21,7 @@ export type File = {
     filename: string;
     createdAt: string;
     updatedAt: string;
-    source: Source[];
+    sources: Source[];
     status: string;
     rating: string;
     uploader: { username: string };
