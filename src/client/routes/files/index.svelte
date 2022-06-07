@@ -40,7 +40,7 @@
         let res: Response;
 
         if ($params.searchParams) {
-            res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/file/search/${ $params.idx + 32 }/${ $params.searchParams }`);
+            res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/file/search/${ $params.idx + 32 }?tags=${ $params.searchParams }`);
         } else {
             res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/file/search/${ $params.idx + 32 }`);
         }
@@ -58,7 +58,7 @@
         intersectionObserver = new IntersectionObserver(
             (entries) => {
                 entries.forEach(entry => {
-                    console.log(entry.isIntersecting);
+                    // console.log(entry.isIntersecting);
                     const eventName = entry.isIntersecting ? 'enterViewport' : 'exitViewport';
                     entry.target.dispatchEvent(new CustomEvent(eventName));
                 });
