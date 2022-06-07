@@ -17,8 +17,7 @@ Parameters:
     "updatedAt": "2022-05-30T15:52:35.298Z",
     "filename": "c3bb72a9-4cbe-4872-b7b2-bf9e27bfa3e8.jpeg",
     "hash": "85747e8865a35c3f44a1e5596b36f79d",
-    "deleted": false,
-    "approved": true,
+    "status": "inbox",
     "rating": "safe",
     "source": {
         "id": "86739154-6dd0-4e94-b8a8-b623c313228d",
