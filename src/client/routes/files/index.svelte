@@ -89,7 +89,7 @@
 
     <div class="flex flex-auto flex-wrap">
         {#each $files as file}
-            <Thumbnail filename={file.filename} id={file.id}/>
+            <Thumbnail filename={file.filename} id={file.id} status={file.status}/>
         {/each}
         <div on:enterViewport={() => fetchFiles()} use:viewport></div>
     </div>

@@ -1,7 +1,7 @@
 <script lang="ts">
     export let filename = '';
     export let id = '';
-    export let approved = false;
+    export let status = '';
     import { fade } from 'svelte/transition';
 
     function getImgUrl(fileName: string) {
@@ -16,7 +16,7 @@
     <a class="" href="/files/{id}">
         <img alt="img" class="rounded-xl shadow-xl" src="{getImgUrl(filename)}" transition:fade>
     </a>
-    {#if approved === false}
+    {#if status === 'inbox'}
         <div>
             <!-- @@TODO on click, approve image or unapprove once clicked again -->
             <span class="absolute top-3 right-3">
