@@ -99,11 +99,29 @@ export async function generateUrlConnectQuery(urls: string[]): Promise<urlConnec
         const site = await getSite(url);
 
         connectQuery.push(<urlConnectQuery>{
-            where: { site_url: { site: site, url: url } },
+            where: { url: url },
             create: { site: site, url: url },
         });
     }
     return connectQuery;
+}
+
+/*
+    Generates a disconnect query for a tag list of strings
+    @param tags: Array of tags to compare against
+    @param fileTags: Array of tags of the file
+    @returns Array of disconnect queries for tags missing from fileTags
+ */
+export async function generateTagDisconnectQuery(tags: string[], fileTags: tags[]): Promise<tagDisconnectQuery[]> {
+    let disconnectQuery: tagDisconnectQuery[] = [];
+    for (const i in fileTags) {
+        if (!tags.includes(fileTags[i].tag)) {
+            disconnectQuery.push({
+                id: fileTags[i].id,
+            });
+        }
+    }
+    return disconnectQuery;
 }
 
 /*
@@ -259,23 +277,33 @@ export interface tagConnectQuery {
     create: { tag: string, namespace: Namespace };
 }
 
+export interface tagDisconnectQuery {
+    id: number;
+}
 
 export interface urlConnectQuery {
-    where: { site_url: { site: Site, url: string } };
+    where: { url: string };
     create: { site: Site, url: string };
 }
 
-export interface disconnectQuery {
-    id: number;
+export interface urlDisconnectQuery {
+    url: string,
 }
 
 export interface dataPayload {
     rating?: Rating,
     source?: {
-        connectOrCreate: urlConnectQuery[]
+        connectOrCreate: urlConnectQuery[],
+        disconnect: urlDisconnectQuery[],
     },
     tags: {
         connectOrCreate: tagConnectQuery[],
-        disconnect: disconnectQuery[]
+        disconnect: tagDisconnectQuery[]
     }
+}
+
+export interface tags {
+    id: number,
+    tag: string,
+    namespace: Namespace
 }

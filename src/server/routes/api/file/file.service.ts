@@ -1,13 +1,13 @@
-import { Rating, Site, FileStatus } from '@prisma/client';
+import { FileStatus, Rating, Site } from '@prisma/client';
 import { Request, Response } from 'express';
 import { DownloaderService } from '../../../downloaders/downloader.service.js';
 import {
     checkIfHashExists,
     createFile,
     dataPayload,
-    disconnectQuery,
     generateFileName,
     generateTagConnectQuery,
+    generateTagDisconnectQuery,
     generateUrlConnectQuery,
     getExtensionFromMimeType,
     getFileHash,
@@ -15,6 +15,7 @@ import {
     getSite,
     isValidMimeType,
     tagConnectQuery,
+    tagDisconnectQuery,
     updateFile,
     writeFile,
 } from '../../../utils/fileUtils.js';
@@ -103,22 +104,17 @@ export async function updateFileHandler(req: Request, res: Response) {
     }
 
     // Remove any tags that are no longer in use
-    let disconnectQuery: disconnectQuery[] = [];
-    for (const i in fileTags) {
-        if (!tags.includes(fileTags[i])) {
-            disconnectQuery.push({
-                id: file.tags[i].id,
-            });
-        }
-    }
+    let disconnectQuery: tagDisconnectQuery[] = await generateTagDisconnectQuery(tags, file.tags);
 
     // Add new tags that are in use
     const tagConnectQuery: tagConnectQuery[] = await generateTagConnectQuery(tags);
+
     if (!source) source = [];
     const urlConnectQuery = await generateUrlConnectQuery(source);
     let dataPayload: dataPayload = {
         source: {
             connectOrCreate: urlConnectQuery,
+            disconnect: [],
         },
         tags: {
             connectOrCreate: tagConnectQuery,
@@ -238,7 +234,7 @@ async function searchImages(idx: number, tags?: string[]) {
                 tags: { some: { tag: { in: tags } } },
                 NOT: {
                     status: FileStatus.deleted,
-                }
+                },
             },
             orderBy: {
                 id: 'desc',
@@ -260,7 +256,7 @@ async function searchImages(idx: number, tags?: string[]) {
             where: {
                 NOT: {
                     status: FileStatus.deleted,
-                }
+                },
             },
             orderBy: {
                 id: 'desc',
