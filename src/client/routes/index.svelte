@@ -49,8 +49,13 @@
                     onclick={handleOnSubmit}>Search
             </button>
         </form>
-        <div class="grid grid-cols-2">
+        <div class="grid grid-cols-3">
             <span class="text-center">{$stats.files} Files</span>
+            {#if $stats.fileSize/1024 > 1024}
+                <span class="text-center">{Math.round($stats.fileSize/1024/1024*100)/100} GB</span>
+            {:else}
+                <span class="text-center">{Math.round($stats.fileSize/1024*100)/100} MB</span>
+            {/if}
             <span class="text-center">{$stats.tags} Tags</span>
         </div>
     </div>
