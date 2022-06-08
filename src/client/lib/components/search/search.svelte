@@ -34,6 +34,7 @@
         const param = $params.searchParams.split(' ');
         param.pop();
         param.push(tag);
+        tags.set([])
         $params.searchParams = param.join(' ') + ' ';
     }
 
