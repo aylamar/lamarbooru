@@ -21,6 +21,7 @@ export type File = {
     filename: string;
     createdAt: string;
     updatedAt: string;
+    size: number;
     sources: Source[];
     status: string;
     rating: string;

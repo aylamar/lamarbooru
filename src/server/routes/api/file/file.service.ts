@@ -10,7 +10,7 @@ import {
     generateTagDisconnectQuery,
     generateUrlConnectQuery,
     getExtensionFromMimeType,
-    getFileHash,
+    getFileHash, getFileSize,
     getRating,
     getSite,
     isValidMimeType,
@@ -53,9 +53,10 @@ export async function uploadFileHandler(req: Request, res: Response) {
     const sources = await generateUrlConnectQuery(source);
 
     const rating = await getRating(data.rating);
+    const fileSize = await getFileSize(rawFile.buffer);
 
     const fileName = await generateFileName(extension);
-    const file = await createFile(fileName, hash, tagConnectQuery, sources, rating);
+    const file = await createFile(fileName, hash, tagConnectQuery, sources, fileSize, rating);
 
     await writeFile(rawFile.buffer, fileName);
 

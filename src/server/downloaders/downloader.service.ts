@@ -7,7 +7,7 @@ import {
     generateTagConnectQuery,
     generateUrlConnectQuery,
     getFileExtensionFromURL,
-    getFileHash,
+    getFileHash, getFileSize,
     getRating,
     isValidExtension,
     writeFile,
@@ -98,13 +98,14 @@ export class DownloaderService {
         const fileBuffer = await DownloaderService.downloadFile(fileUrl);
         const hash = await getFileHash(fileBuffer);
         const fileName = await generateFileName(fileExtension);
+        const fileSize = await getFileSize(fileBuffer);
 
         // check to see if hash already exists
         const exists = await checkIfHashExists(hash);
         if (exists) return { file: exists, status: 'exists' };
 
         // Add to database and write to disk
-        const file = await createFile(fileName, hash, connectQuery, source, rating);
+        const file = await createFile(fileName, hash, connectQuery, source, fileSize, rating);
         await writeFile(fileBuffer, fileName);
 
         return { file: file, status: 'success' };

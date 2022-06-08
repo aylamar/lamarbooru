@@ -48,15 +48,17 @@ async function createFolders(fileName: string) {
     @param source: Source urls in array of strings
     @returns Image object
 */
-export async function createFile(fileName: string, hash: string, connectQuery: tagConnectQuery[], source: urlConnectQuery[], rating?: Rating): Promise<File> {
+export async function createFile(fileName: string, hash: string, connectQuery: tagConnectQuery[], source: urlConnectQuery[], fileSize: number, rating?: Rating): Promise<File> {
     if (!rating) rating = Rating.explicit;
 
     return await prisma.file.create({
         data: {
-            filename: fileName, hash: hash, rating: rating, sources: { connectOrCreate: source },
-            tags: {
-                connectOrCreate: connectQuery,
-            },
+            filename: fileName,
+            hash: hash,
+            rating: rating,
+            size: fileSize,
+            sources: { connectOrCreate: source },
+            tags: { connectOrCreate: connectQuery },
         },
         include: {
             tags: true,
@@ -260,6 +262,10 @@ export async function getFileExtensionFromURL(url: string) {
 export async function isValidMimeType(mimetype: string): Promise<boolean> {
     const allowedMimeTypes = ['image/png', 'image/jpg', 'image/jpeg'];
     return allowedMimeTypes.includes(mimetype);
+}
+
+export async function getFileSize(file: Buffer): Promise<number> {
+    return  Math.round(file.byteLength / 1024);
 }
 
 export async function updateFile(id: number, dataPayload: dataPayload) {

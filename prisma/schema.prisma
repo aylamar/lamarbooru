@@ -15,6 +15,7 @@ model File {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   filename  String     @unique
+  size      Int
   hash      String     @unique
   tags      Tag[]
   sources   Url[]

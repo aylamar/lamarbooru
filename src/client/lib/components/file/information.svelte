@@ -11,6 +11,7 @@
         {/if}
         <li>Rating: {$file.rating[0].toUpperCase() + $file.rating.slice(1)}</li>
         <li>Status: {$file.status.toString()}</li>
+        <li>File Size: {Math.round($file.size/1024*100)/100} MB</li>
         {#if $file.sources}
             <li>Sources:</li>
             {#each $file.sources as source}
