@@ -5,18 +5,22 @@ import {
     checkIfHashExists,
     createFile,
     dataPayload,
-    generateFileName, generateSourceDisconnectQuery,
+    generateFileName,
+    generateSourceDisconnectQuery,
     generateTagConnectQuery,
     generateTagDisconnectQuery,
     generateUrlConnectQuery,
     getExtensionFromMimeType,
-    getFileHash, getFileSize,
+    getFileHash,
+    getFileSize,
     getRating,
     getSite,
     isValidMimeType,
     tagConnectQuery,
     tagDisconnectQuery,
-    updateFile, urlConnectQuery, urlDisconnectQuery,
+    updateFile,
+    urlConnectQuery,
+    urlDisconnectQuery,
     writeFile,
 } from '../../../utils/fileUtils.js';
 import prisma from '../../../utils/prisma.js';
@@ -225,8 +229,8 @@ async function getFileById(id: number) {
                     site: true,
                     status: true,
                     _count: true,
-                }
-            }
+                },
+            },
         },
     });
 }
@@ -239,12 +243,18 @@ async function getFileById(id: number) {
  */
 async function searchImages(idx: number, tags?: string[]) {
     if (tags) {
+        const tagQueryArr: tagQuery[] = tags.map((tag) => {
+            return { tags: { some: { tag: { in: tag } } } };
+        });
+
         return await prisma.file.findMany({
             where: {
-                tags: { some: { tag: { in: tags } } },
-                NOT: {
-                    status: FileStatus.deleted,
-                },
+                AND: [
+                    {
+                        NOT: { status: FileStatus.deleted },
+                    },
+                    ...tagQueryArr,
+                ],
             },
             orderBy: {
                 id: 'desc',
@@ -284,4 +294,8 @@ async function searchImages(idx: number, tags?: string[]) {
             skip: idx - 1, take: 32,
         });
     }
+}
+
+interface tagQuery {
+    tags: { some: { tag: { in: string } } };
 }
