@@ -1,4 +1,4 @@
-import { File, Namespace, Rating, Site, UrlStatus } from '@prisma/client';
+import { File, FileStatus, Namespace, Rating, Site, UrlStatus } from '@prisma/client';
 import crypto from 'crypto';
 import fs from 'fs';
 import sharp from 'sharp';
@@ -316,6 +316,31 @@ export async function writeFile(file: Buffer, fileName: string) {
 
     fs.writeFileSync(`${ fileBasePath }/${ filePath }`, file);
     await generateThumbnail(filePath);
+}
+
+/*
+    Delete the specified file and flag it as deleted
+    @param id: id of the file to delete
+    @returns true or false based on whether the file was deleted or not
+ */
+export async function deleteFile(id: number) {
+    // set the file status to deleted
+    const file = await updateFileStatus(id, FileStatus.deleted);
+    if (!file) return false;
+
+    // delete the file from the file system
+    const filePath = `${ file.filename.substring(0, 2) }/${ file.filename }`;
+    fs.unlinkSync(`${ fileBasePath }/${ filePath }`);
+    fs.unlinkSync(`${ thumbnailBasePath }/${ filePath }`);
+
+    return true;
+}
+
+export async function updateFileStatus(id: number, status: FileStatus) {
+    return await prisma.file.update({
+        where: { id: id },
+        data: { status: status },
+    });
 }
 
 export interface tagConnectQuery {

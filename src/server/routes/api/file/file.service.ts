@@ -1,4 +1,4 @@
-import { FileStatus, Rating, Site } from '@prisma/client';
+import { FileStatus, Prisma, Rating, Site } from '@prisma/client';
 import { Request, Response } from 'express';
 import { DownloaderService } from '../../../downloaders/downloader.service.js';
 import {
@@ -19,6 +19,7 @@ import {
     tagConnectQuery,
     tagDisconnectQuery,
     updateFile,
+    updateFileStatus,
     urlConnectQuery,
     urlDisconnectQuery,
     writeFile,
@@ -155,7 +156,7 @@ export async function searchFileHandler(req: Request, res: Response) {
 }
 
 export async function getFileStats(req: Request, res: Response) {
-    const files = await prisma.file.count()
+    const files = await prisma.file.count();
     let fileSize = await prisma.file.aggregate({
         _sum: {
             size: true,
@@ -164,7 +165,7 @@ export async function getFileStats(req: Request, res: Response) {
             NOT: {
                 status: FileStatus.deleted,
             },
-        }
+        },
     });
     const tags = await prisma.tag.count();
     return res.status(200).send({ files: files, fileSize: fileSize._sum.size, tags: tags });
@@ -206,6 +207,50 @@ export async function tagSearchHandler(req: Request, res: Response) {
         },
     });
     res.send(tags);
+}
+
+export async function trashFileHandler(req: Request, res: Response) {
+    let data: { id: number };
+    try {
+        data = await idSchema.validateAsync(req.params);
+    } catch (err: any) {
+        return res.status(400).send(err.details);
+    }
+
+    try {
+        const file = await getFileById(data.id);
+        if (!file) return res.status(404).send({ 'error': 'No files found' });
+        if (file.status === FileStatus.trash || file.status === FileStatus.deleted) return res.status(405).send({ 'error': 'File already in trash' });
+
+        const updatedFile = await updateFileStatus(data.id, FileStatus.trash);
+    } catch (err: any) {
+        if (err instanceof Prisma.PrismaClientKnownRequestError) return res.status(404).send({ 'error': 'No files found' });
+        return res.status(500).send({ 'error': 'Error updating file' });
+    }
+
+    return res.status(202).send({ 'success': 'File moved to the trash' });
+}
+
+export async function unTrashFileHandler(req: Request, res: Response) {
+    let data: { id: number };
+    try {
+        data = await idSchema.validateAsync(req.params);
+    } catch (err: any) {
+        return res.status(400).send(err.details);
+    }
+
+    try {
+        const file = await getFileById(data.id);
+        if (!file) return res.status(404).send({ 'error': 'No files found' });
+        if (file.status != FileStatus.trash) return res.status(405).send({ 'error': 'File is not in trash' });
+
+        const updatedFile = await updateFileStatus(data.id, FileStatus.inbox);
+    } catch (err: any) {
+        if (err instanceof Prisma.PrismaClientKnownRequestError) return res.status(404).send({ 'error': 'No files found' });
+        return res.status(500).send({ 'error': 'Error updating file' });
+    }
+
+    return res.status(202).send({ 'success': 'File has been removed from the trash and moved to inbox' });
 }
 
 /*
@@ -263,6 +308,9 @@ async function searchImages(idx: number, tags?: string[]) {
                     {
                         NOT: { status: FileStatus.deleted },
                     },
+                    {
+                        NOT: { status: FileStatus.trash },
+                    },
                     ...tagQueryArr,
                 ],
             },
@@ -284,9 +332,14 @@ async function searchImages(idx: number, tags?: string[]) {
     } else {
         return await prisma.file.findMany({
             where: {
-                NOT: {
-                    status: FileStatus.deleted,
-                },
+                AND: [
+                    {
+                        NOT: { status: FileStatus.deleted },
+                    },
+                    {
+                        NOT: { status: FileStatus.trash },
+                    },
+                ],
             },
             orderBy: {
                 id: 'desc',

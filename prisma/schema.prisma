@@ -96,6 +96,7 @@ model SubscriptionLog {
 enum FileStatus {
   archived
   inbox
+  trash
   deleted
 }
 

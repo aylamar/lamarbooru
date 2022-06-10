@@ -133,6 +133,46 @@ Unsuccessful response codes:
 * 404: No file found with that id.
 * 500: Database error while updating file.
 
+### PUT `/api/file/trash/:id`
+
+_Removes a file from the trash and moves it to the inbox._
+
+Parameters:
+
+* `id`: (required) The ID of the file to move to the inbox.
+
+```json title="Successful Reponse (200)"
+{
+    "success": "File has been removed from the trash and moved to inbox"
+}
+```
+
+Unsuccessful response codes:
+
+* 404: No file with matching id found.
+* 405: File found, but it is already deleted or in the trash.
+* 500: Database error while updating file.
+
+### DELETE `/api/file/trash/:id`
+
+_Adds a file to the trash._
+
+Parameters:
+
+* `id`: (required) The ID of the file to move to the trash.
+
+```json title="Successful Reponse (200)"
+{
+    "success": "File moved to the trash"
+}
+```
+
+Unsuccessful response codes:
+
+* 404: No file with matching id found.
+* 405: File found, but it is not in the trash.
+* 500: Database error while updating file.
+
 ### POST `/api/file/booru`
 
 _Add a new file to the database using data from a booru._
