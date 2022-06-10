@@ -264,10 +264,21 @@ export async function isValidMimeType(mimetype: string): Promise<boolean> {
     return allowedMimeTypes.includes(mimetype);
 }
 
+/*
+    Gets the size of a file from the provided buffer
+    @param buffer: File in buffer
+    @returns size of file in kb as a number
+ */
 export async function getFileSize(file: Buffer): Promise<number> {
-    return  Math.round(file.byteLength / 1024);
+    return Math.round(file.byteLength / 1024);
 }
 
+/*
+    Updates a file using the provided data payload
+    @param id: id of file to update
+    @param dataPayload: dataPayload containing connection queries + update data
+    @returns updated file
+ */
 export async function updateFile(id: number, dataPayload: dataPayload) {
     return await prisma.file.update({
         where: { id: id },
@@ -288,8 +299,8 @@ export async function updateFile(id: number, dataPayload: dataPayload) {
                     site: true,
                     status: true,
                     _count: true,
-                }
-            }
+                },
+            },
         },
     });
 }
