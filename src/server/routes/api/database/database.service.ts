@@ -3,19 +3,15 @@ import { Request, Response } from 'express';
 import prisma from '../../../utils/prisma.js';
 
 export async function getStats(req: Request, res: Response) {
-    const files = await prisma.file.count({
-        where: {
-            NOT: { status: FileStatus.deleted },
-        },
-    });
-    let fileSize = await prisma.file.aggregate({
+    let files = await prisma.file.aggregate({
         _sum: {
             size: true,
-        },
-        where: {
+        }, _count: {
+            id: true,
+        }, where: {
             NOT: { status: FileStatus.deleted },
         },
     });
     const tags = await prisma.tag.count();
-    return res.status(200).send({ files: files, fileSize: fileSize._sum.size, tags: tags });
+    return res.status(200).send({ files: files._count.id, fileSize: files._sum.size, tags: tags });
 }
