@@ -11,7 +11,7 @@ Eventually, the goal is to provide a docker image for easy setup/installation.
 * `VITE_BASE_URL`: Base URL for webserver, should be `https://localhost:3000/` for development. `/` can be used as well.
 * `FILES_DIRECTORY`: Location on disk to store uploaded files. 
 * `THUMBNAILS_DIRECTORY`: Location on disk to store generated thumbnails.
-
+* `DELETE_MISPLACED_FILES`: Should be `true` or `false`. If `true`, any files in the two above directories that are not in the database and are named with a valid UUID will be deleted during weekly maintenance.
 
 ### Example .env file
 
@@ -21,6 +21,7 @@ DATABASE_URL="postgresql://postgres:very_secure_password_that_you_should_probabl
 VITE_BASE_URL=http://localhost:3000/
 FILES_DIRECTORY="/Lamarbooru/files"
 THUMBNAILS_DIRECTORY="/Lamarbooru/thumbnails"
+DELETE_MISPLACED_FILES=true
 ```
 
 ## Setup Process
