@@ -8,7 +8,7 @@ export class SubscriptionsService {
 
     constructor() {
         this.downloaderService = new DownloaderService();
-        this.isRunning = false;
+        this.isRunning = true;
         // start subscriptions that were running when server was shut off
         void this.init();
 
