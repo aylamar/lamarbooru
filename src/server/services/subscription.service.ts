@@ -1,10 +1,10 @@
 import { Interval, Site, Subscription, SubscriptionRun, SubscriptionStatus, UrlStatus } from '@prisma/client';
+import { DownloaderService } from '../downloaders/downloader.service.js';
 import prisma from '../utils/prisma.js';
-import { DownloaderService } from './downloader.service.js';
 
 export class SubscriptionsService {
     private downloaderService: DownloaderService;
-    private isRunning: boolean
+    private isRunning: boolean;
 
     constructor() {
         this.downloaderService = new DownloaderService();

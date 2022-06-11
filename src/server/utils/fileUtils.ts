@@ -319,21 +319,20 @@ export async function writeFile(file: Buffer, fileName: string) {
 }
 
 /*
-    Delete the specified file and flag it as deleted
+    Delete the specified file from the file system
     @param id: id of the file to delete
     @returns true or false based on whether the file was deleted or not
  */
-export async function deleteFile(id: number) {
-    // set the file status to deleted
-    const file = await updateFileStatus(id, FileStatus.deleted);
-    if (!file) return false;
-
-    // delete the file from the file system
-    const filePath = `${ file.filename.substring(0, 2) }/${ file.filename }`;
-    fs.unlinkSync(`${ fileBasePath }/${ filePath }`);
-    fs.unlinkSync(`${ thumbnailBasePath }/${ filePath }`);
-
-    return true;
+export async function deleteFile(filename: string) {
+    try {
+        const filePath = `${ filename.substring(0, 2) }/${ filename }`;
+        fs.unlinkSync(`${ fileBasePath }/${ filePath }`);
+        fs.unlinkSync(`${ thumbnailBasePath }/${ filePath }`);
+        return true;
+    } catch (err: any) {
+        console.log(err);
+        return false;
+    }
 }
 
 export async function updateFileStatus(id: number, status: FileStatus) {

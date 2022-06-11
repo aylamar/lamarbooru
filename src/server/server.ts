@@ -3,8 +3,9 @@ import express from 'express';
 import path from 'path';
 //@ts-ignore
 import { handler } from '../client/handler.js';
-import { SubscriptionsService } from './downloaders/subscription.service.js';
 import routeController from './routes/route.controller.js';
+import { SubscriptionsService } from './services/subscription.service.js';
+import { TrashService } from './services/trash.service.js';
 
 const server = express();
 const port = process.env.PORT || 3000;
@@ -37,6 +38,7 @@ server.use(handler);
 
 // start subscription service
 const subscriptionService = new SubscriptionsService();
+const trashService = new TrashService();
 
 server.listen(port);
 console.log(`Server listening on port ${ port }`);
