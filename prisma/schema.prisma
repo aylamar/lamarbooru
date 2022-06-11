@@ -11,16 +11,17 @@ datasource db {
 }
 
 model File {
-  id         Int        @id @default(autoincrement())
-  createDate DateTime   @default(now())
-  updateDate DateTime   @updatedAt
-  filename   String     @unique
-  size       Int
-  hash       String     @unique
-  tags       Tag[]
-  sources    Url[]
-  status     FileStatus @default(inbox)
-  rating     Rating     @default(explicit)
+  id               Int               @id @default(autoincrement())
+  createDate       DateTime          @default(now())
+  updateDate       DateTime          @updatedAt
+  filename         String            @unique
+  size             Int
+  hash             String            @unique
+  tags             Tag[]
+  sources          Url[]
+  status           FileStatus        @default(inbox)
+  rating           Rating            @default(explicit)
+  subscriptionLogs SubscriptionLog[]
 
   @@map("files")
 }
@@ -87,6 +88,8 @@ model SubscriptionLog {
   id                String           @id @unique @default(uuid())
   subscriptionRun   SubscriptionRun? @relation(fields: [subscriptionRunId], references: [id])
   subscriptionRunId Int?
+  file              File?            @relation(fields: [fileId], references: [id])
+  fileId            Int?
   url               String
   status            UrlStatus
   createDate        DateTime         @default(now())

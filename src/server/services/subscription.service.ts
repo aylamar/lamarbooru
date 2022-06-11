@@ -90,7 +90,7 @@ export class SubscriptionsService {
         });
     }
 
-    private static async updateRunCounts(run: SubscriptionRun, url: string, status: UrlStatus) {
+    private static async updateRunCounts(run: SubscriptionRun, url: string, status: UrlStatus, fileId?: number) {
         const data = await SubscriptionsService.getCount(run, status);
 
         return await prisma.subscriptionRun.update({
@@ -101,6 +101,7 @@ export class SubscriptionsService {
                         create: {
                             url: url,
                             status: status,
+                            fileId: fileId,
                         },
                     },
                 },
@@ -237,7 +238,7 @@ export class SubscriptionsService {
                     prevImg = file.status;
                     switch (file.status) {
                         case 'success':
-                            run = await SubscriptionsService.updateRunCounts(run, url, UrlStatus.downloaded);
+                            run = await SubscriptionsService.updateRunCounts(run, url, UrlStatus.downloaded, file.file.id);
                             break;
                         case 'failed':
                             run = await SubscriptionsService.updateRunCounts(run, url, UrlStatus.failed);
