@@ -197,11 +197,20 @@ export async function getNamespace(tag: string): Promise<Namespace> {
 
 export async function getSite(url: string): Promise<Site> {
     const parsedUrl = new URL(url);
-    switch (parsedUrl.host) {
+    const hostname = parsedUrl.hostname.replace(/^www\./, '');
+    switch (hostname) {
         case 'danbooru.donmai.us':
             return Site.danbooru;
         case 'pixiv.net':
             return Site.pixiv;
+        case 'files.yande.re':
+            return Site.yandere;
+        case 'nekoda.fanbox.cc':
+            return Site.fanbox;
+        case 'twitter.com':
+            return Site.twitter;
+        case 'gelbooru.com':
+            return Site.gelbooru;
         default:
             return Site.unknown;
     }

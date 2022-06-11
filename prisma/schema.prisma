@@ -111,7 +111,11 @@ enum UrlStatus {
 
 enum Site {
   danbooru
+  gelbooru
   pixiv
+  yandere
+  fanbox
+  twitter
   unknown
 }
 
