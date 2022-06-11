@@ -104,9 +104,9 @@ export class DownloaderService {
         const exists = await checkIfHashExists(hash);
         if (exists) return { file: exists, status: 'exists' };
 
-        // Add to database and write to disk
-        const file = await createFile(fileName, hash, connectQuery, source, fileSize, rating);
+        // Write file to disk then add to database
         await writeFile(fileBuffer, fileName);
+        const file = await createFile(fileName, hash, connectQuery, source, fileSize, rating);
 
         return { file: file, status: 'success' };
     }
