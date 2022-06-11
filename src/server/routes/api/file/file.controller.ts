@@ -3,7 +3,6 @@ import multer, { memoryStorage } from 'multer';
 import {
     getFileHandler,
     searchFileHandler,
-    tagSearchHandler,
     trashFileHandler,
     unTrashFileHandler,
     updateFileHandler,
@@ -29,7 +28,5 @@ router.delete('/trash/:id', trashFileHandler);
 router.get('/search/:id/', searchFileHandler);
 // PUT /api/file/booru to upload a file from booru
 router.post('/booru', uploadBooruFile);
-// GET /api/file/tags/:tag to get a list of tags starting with :tag
-router.get('/tags/:tag', tagSearchHandler);
 
 export default router;

@@ -37,7 +37,7 @@
         if (!$params.searchParams) return tags.set([]);
         const param = $params.searchParams.split(' ').pop();
         if (!param) return tags.set([]);
-        const res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/file/tags/${ param }`);
+        const res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/tag/search/${ param }`);
         const parsedTags: Tag[] = await res.json();
         tags.set(parsedTags.slice(0, 5));
         return;

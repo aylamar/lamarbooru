@@ -212,7 +212,27 @@ Parameters:
 ]
 ```
 
-### GET `/api/file/tags/:tag`
+Unsuccessful response codes:
+
+* 404: No tags found with the parameters provided.
+
+## Database Routes
+
+### GET `/api/database/stats`
+
+_Get stats about the database_
+
+```json title="Successful Reponse (200)"
+{
+    "files": 200,
+    "fileSize": 678107,
+    "tags": 1090
+}
+```
+
+## Tag Routes
+
+### GET `/api/tag/search/:tag`
 
 _Get all tags that start with the :tag parameter_
 
@@ -233,25 +253,6 @@ Parameters:
         "namespace": "tag"
     }
 ]
-```
-
-
-Unsuccessful response codes:
-
-* 404: No tags found with the parameters provided.
-
-## Database Routes
-
-### GET `/api/database/stats`
-
-_Get stats about the database_
-
-```json title="Successful Reponse (200)"
-{
-    "files": 200,
-    "fileSize": 678107,
-    "tags": 1090
-}
 ```
 
 ## Subscription Routes
