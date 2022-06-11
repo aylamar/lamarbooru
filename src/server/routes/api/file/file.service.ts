@@ -155,22 +155,6 @@ export async function searchFileHandler(req: Request, res: Response) {
     res.status(200).send(files);
 }
 
-export async function getFileStats(req: Request, res: Response) {
-    const files = await prisma.file.count();
-    let fileSize = await prisma.file.aggregate({
-        _sum: {
-            size: true,
-        },
-        where: {
-            NOT: {
-                status: FileStatus.deleted,
-            },
-        },
-    });
-    const tags = await prisma.tag.count();
-    return res.status(200).send({ files: files, fileSize: fileSize._sum.size, tags: tags });
-}
-
 export async function uploadBooruFile(req: Request, res: Response) {
     let data: {
         url: string,
@@ -222,7 +206,7 @@ export async function trashFileHandler(req: Request, res: Response) {
         if (!file) return res.status(404).send({ 'error': 'No files found' });
         if (file.status === FileStatus.trash || file.status === FileStatus.deleted) return res.status(405).send({ 'error': 'File already in trash' });
 
-        const updatedFile = await updateFileStatus(data.id, FileStatus.trash);
+        await updateFileStatus(data.id, FileStatus.trash);
     } catch (err: any) {
         if (err instanceof Prisma.PrismaClientKnownRequestError) return res.status(404).send({ 'error': 'No files found' });
         return res.status(500).send({ 'error': 'Error updating file' });
@@ -244,7 +228,7 @@ export async function unTrashFileHandler(req: Request, res: Response) {
         if (!file) return res.status(404).send({ 'error': 'No files found' });
         if (file.status != FileStatus.trash) return res.status(405).send({ 'error': 'File is not in trash' });
 
-        const updatedFile = await updateFileStatus(data.id, FileStatus.inbox);
+        await updateFileStatus(data.id, FileStatus.inbox);
     } catch (err: any) {
         if (err instanceof Prisma.PrismaClientKnownRequestError) return res.status(404).send({ 'error': 'No files found' });
         return res.status(500).send({ 'error': 'Error updating file' });

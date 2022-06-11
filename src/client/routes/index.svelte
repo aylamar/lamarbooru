@@ -3,7 +3,7 @@
 
 
     export async function load({ fetch }) {
-        const res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/file/stats`);
+        const res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/database/stats`);
         stats.set(await res.json());
         return {
             stats: res.status,
