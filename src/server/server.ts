@@ -36,9 +36,9 @@ server.use(routeController);
 // initialize svelte-kit
 server.use(handler);
 
-// start subscription service
-const subscriptionService = new SubscriptionsService();
-const trashService = new TrashService();
+// start misc services
+new SubscriptionsService();
+new TrashService();
 
 server.listen(port);
 console.log(`Server listening on port ${ port }`);
