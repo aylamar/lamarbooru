@@ -6,8 +6,8 @@
     <p class="font-bold text-lg">Information</p>
     <ul>
         <li>ID: {$file.id}</li>
-        {#if $file.updatedAt}
-            <li>Upload Date: {$file.updatedAt.split('T')[0].replace('-', '/').replace('-', '/')}</li>
+        {#if $file.updateDate}
+            <li>Upload Date: {$file.updateDate.split('T')[0].replace('-', '/').replace('-', '/')}</li>
         {/if}
         <li>Rating: {$file.rating[0].toUpperCase() + $file.rating.slice(1)}</li>
         <li>Status: {$file.status.toString()}</li>

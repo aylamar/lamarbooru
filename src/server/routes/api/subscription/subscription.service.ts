@@ -62,7 +62,7 @@ export async function getSubscriptionAllHandler(req: Request, res: Response) {
             },
         },
         orderBy: {
-            createdAt: 'desc',
+            createDate: 'desc',
         },
     });
 

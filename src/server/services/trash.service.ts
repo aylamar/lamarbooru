@@ -18,7 +18,7 @@ export class TrashService {
         return await prisma.file.findMany({
             where: {
                 AND: [
-                    { updatedAt: { lt: date } },
+                    { updateDate: { lt: date } },
                     { status: FileStatus.trash },
                 ],
             },

@@ -13,8 +13,8 @@ Parameters:
 ```json title="Successful Reponse (200)"
 {
     "id": 1,
-    "createdAt": "2022-05-30T15:52:35.297Z",
-    "updatedAt": "2022-05-30T15:52:35.298Z",
+    "createDate": "2022-05-30T15:52:35.297Z",
+    "updateDate": "2022-05-30T15:52:35.298Z",
     "filename": "c3bb72a9-4cbe-4872-b7b2-bf9e27bfa3e8.jpeg",
     "hash": "85747e8865a35c3f44a1e5596b36f79d",
     "status": "inbox",
@@ -265,8 +265,8 @@ _Get a list of all subscriptions._
 [
     {
         "id": 2,
-        "createdAt": "2022-06-05T02:59:46.851Z",
-        "updatedAt": "2022-06-05T03:00:51.360Z",
+        "createDate": "2022-06-05T02:59:46.851Z",
+        "updateDate": "2022-06-05T03:00:51.360Z",
         "site": "danbooru",
         "tags": [
             "1girl"
@@ -282,8 +282,8 @@ _Get a list of all subscriptions._
     },
     {
         "id": 1,
-        "createdAt": "2022-06-05T02:08:40.361Z",
-        "updatedAt": "2022-06-05T02:20:06.852Z",
+        "createDate": "2022-06-05T02:08:40.361Z",
+        "updateDate": "2022-06-05T02:20:06.852Z",
         "site": "danbooru",
         "tags": [
             "mizuhara_chizuru"
@@ -323,8 +323,8 @@ Parameters:
 ```json title="Successful Reponse (201)"
 {
     "id": 1,
-    "createdAt": "2022-06-05T02:59:46.851Z",
-    "updatedAt": "2022-06-05T03:00:51.360Z",
+    "createDate": "2022-06-05T02:59:46.851Z",
+    "updateDate": "2022-06-05T03:00:51.360Z",
     "site": "danbooru",
     "tags": [
         "mizuhara_chizuru"
@@ -354,8 +354,8 @@ Parameters:
 ```json title="Successful Reponse (200)"
 {
     "id": 1,
-    "createdAt": "2022-06-05T02:08:40.361Z",
-    "updatedAt": "2022-06-05T02:20:06.852Z",
+    "createDate": "2022-06-05T02:08:40.361Z",
+    "updateDate": "2022-06-05T02:20:06.852Z",
     "site": "danbooru",
     "tags": [
         "mizuhara_chizuru"
@@ -370,8 +370,8 @@ Parameters:
     "runs": [
         {
             "id": 1,
-            "createdAt": "2022-06-05T02:12:04.876Z",
-            "updatedAt": "2022-06-05T02:20:06.843Z",
+            "createDate": "2022-06-05T02:12:04.876Z",
+            "updateDate": "2022-06-05T02:20:06.843Z",
             "site": "danbooru",
             "tags": [
                 "mizuhara_chizuru"
@@ -407,8 +407,8 @@ Parameters:
 ```json title="Successful Reponse (200)"
 {
     "id": 1,
-    "createdAt": "2022-06-05T02:08:40.361Z",
-    "updatedAt": "2022-06-05T02:20:06.852Z",
+    "createDate": "2022-06-05T02:08:40.361Z",
+    "updateDate": "2022-06-05T02:20:06.852Z",
     "site": "danbooru",
     "tags": [
         "mizuhara_chizuru"
@@ -426,8 +426,8 @@ Parameters:
             "subscriptionRunId": 1,
             "url": "https://danbooru.donmai.us/posts/000000",
             "status": "downloaded",
-            "createdAt": "2022-06-05T02:12:06.132Z",
-            "updatedAt": "2022-06-05T02:12:06.133Z"
+            "createDate": "2022-06-05T02:12:06.132Z",
+            "updateDate": "2022-06-05T02:12:06.133Z"
         },
         .... etc ....
     ]

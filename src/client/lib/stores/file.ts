@@ -19,8 +19,8 @@ export type Source = {
 export type File = {
     id: number;
     filename: string;
-    createdAt: string;
-    updatedAt: string;
+    createDate: string;
+    updateDate: string;
     size: number;
     sources: Source[];
     status: string;

@@ -2,8 +2,8 @@ import { writable } from 'svelte/store';
 
 export type Run = {
     id: number,
-    createdAt: Date,
-    updatedAt: Date,
+    createDate: Date,
+    updateDate: Date,
     site: string,
     tags: string[],
     status: string,
@@ -17,8 +17,8 @@ export type Run = {
 
 export type Subscription = {
     id: number,
-    createdAt: Date,
-    updatedAt: Date,
+    createDate: Date,
+    updateDate: Date,
     site: string,
     tags: string[],
     tagBlacklist: string[],
@@ -33,12 +33,12 @@ export type Subscription = {
 }
 
 export type Log = {
-    'id': string,
-    'subscriptionRunId': number,
-    'url': string,
-    'status': string,
-    'createdAt': Date,
-    'updatedAt': Date
+    id: string,
+    subscriptionRunId: number,
+    url: string,
+    status: string,
+    createDate: Date,
+    updateDate: Date
 }
 
 export const subscription = writable({} as Subscription);

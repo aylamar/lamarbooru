@@ -106,7 +106,7 @@
                             <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{formatDateTime(sub.nextRun)}</td>
                             <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 text-slate-500 dark:text-slate-400">{sub._count.runs}</td>
                             <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{sub.limit}</td>
-                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{formatDate(sub.createdAt)}</td>
+                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{formatDate(sub.createDate)}</td>
                             <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400"><a
                                     href={`/subscriptions/${sub.id}`}>More Details</a></td>
                         </tr>

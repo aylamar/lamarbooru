@@ -11,16 +11,16 @@ datasource db {
 }
 
 model File {
-  id        Int        @id @default(autoincrement())
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  filename  String     @unique
-  size      Int
-  hash      String     @unique
-  tags      Tag[]
-  sources   Url[]
-  status    FileStatus @default(inbox)
-  rating    Rating     @default(explicit)
+  id         Int        @id @default(autoincrement())
+  createDate DateTime   @default(now())
+  updateDate DateTime   @updatedAt
+  filename   String     @unique
+  size       Int
+  hash       String     @unique
+  tags       Tag[]
+  sources    Url[]
+  status     FileStatus @default(inbox)
+  rating     Rating     @default(explicit)
 
   @@map("files")
 }
@@ -48,8 +48,8 @@ model Url {
 
 model Subscription {
   id           Int                @id @default(autoincrement())
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
+  createDate   DateTime           @default(now())
+  updateDate   DateTime           @updatedAt
   site         Site
   tags         String[]
   tagBlacklist String[]
@@ -66,8 +66,8 @@ model Subscription {
 
 model SubscriptionRun {
   id                 Int                @id @unique @default(autoincrement())
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
+  createDate         DateTime           @default(now())
+  updateDate         DateTime           @updatedAt
   subscription       Subscription       @relation(fields: [site, tags], references: [site, tags])
   site               Site
   tags               String[]
@@ -89,8 +89,8 @@ model SubscriptionLog {
   subscriptionRunId Int?
   url               String
   status            UrlStatus
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
+  createDate        DateTime         @default(now())
+  updateDate        DateTime         @updatedAt
 }
 
 enum FileStatus {

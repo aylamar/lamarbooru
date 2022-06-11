@@ -80,9 +80,9 @@
                             <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{run.downloadedUrlCount}</td>
                             <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{run.skippedUrlCount}</td>
                             <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{run.failedUrlCount}</td>
-                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{formatDateTime(run.createdAt)}</td>
+                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{formatDateTime(run.createDate)}</td>
                             <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{formatDateTime(run.finishedAt)}</td>
-                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{formatDateTime(run.updatedAt)}</td>
+                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{formatDateTime(run.updateDate)}</td>
                         </tr>
                     {/each}
                 </table>
