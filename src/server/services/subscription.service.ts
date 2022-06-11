@@ -126,6 +126,18 @@ export class SubscriptionsService {
         });
     }
 
+    private static async getMostRecentUrl(sub: Subscription): Promise<string|undefined> {
+        const log = await prisma.subscriptionLog.findFirst({
+            where: {
+                subscriptionRunId: sub.id,
+            },
+            orderBy: {
+                createDate: 'desc',
+            }
+        });
+        return log?.url;
+    }
+
     private static async checkIfURLInDatabase(url: string) {
         return await prisma.url.findFirst({
             where: {
@@ -172,7 +184,9 @@ export class SubscriptionsService {
                 console.log(`Subscription not found for run with id ${ run.id }.`);
                 continue;
             }
-            await this.subscriptionRunner(sub, run);
+            const prevUrl = await SubscriptionsService.getMostRecentUrl(sub);
+
+            await this.subscriptionRunner(sub, run, prevUrl);
         }
         this.isRunning = false;
     }
@@ -190,18 +204,20 @@ export class SubscriptionsService {
 
         for (const sub of waitingSubs) {
             console.log(`Starting ${ sub.tags.join(' ') } on ${ sub.site }.`);
-            await this.subscriptionRunner(sub).then(() => {
-                console.log(`Finished ${ sub.tags.join(' ') } on ${ sub.site }.`);
-            });
+            await this.subscriptionRunner(sub)
+            console.log(`Finished ${ sub.tags.join(' ') } on ${ sub.site }.`);
         }
 
         this.isRunning = false;
     }
 
-    private async processSubscription(run: SubscriptionRun, limit: number, blacklist: string[]) {
+    private async processSubscription(run: SubscriptionRun, limit: number, blacklist: string[], prevUrl?: string) {
         let skippedInARow = 0;
         let prevImg = '';
         let keepRunning = true;
+        let resumedRun = false;
+        if (prevUrl) resumedRun = true;
+
         while (keepRunning) {
             // update page number
             run = await SubscriptionsService.updateRunPage(run, run.pageNumber);
@@ -222,6 +238,13 @@ export class SubscriptionsService {
                 if (skippedInARow >= 20 || run.downloadedUrlCount >= limit) {
                     keepRunning = false;
                     break;
+                }
+
+                // if this is a resumed run, skip all urls until finding the previous url
+                if (resumedRun && url !== prevUrl) continue;
+                if (resumedRun && url === prevUrl) {
+                    resumedRun = false;
+                    continue
                 }
 
                 // check to see if it exists
@@ -272,8 +295,9 @@ export class SubscriptionsService {
         }
     }
 
-    private async subscriptionRunner(sub: Subscription, run?: SubscriptionRun) {
+    private async subscriptionRunner(sub: Subscription, run?: SubscriptionRun, prevUrl?: string) {
         console.log(`starting subscription: ${ sub.tags.join(' ') } on ${ sub.site }`);
+        // if run is not provided, this is a new run so a new run must be created
         if (!run) {
             run = await SubscriptionsService.startNewSubscriptionRun(sub);
             await SubscriptionsService.updateSubscriptionStatus(sub, SubscriptionStatus.running);
@@ -281,7 +305,7 @@ export class SubscriptionsService {
 
         const nextRun = await SubscriptionsService.getNextRunDate(sub.interval);
 
-        await this.processSubscription(run, sub.limit, sub.tagBlacklist);
+        await this.processSubscription(run, sub.limit, sub.tagBlacklist, prevUrl);
 
         await SubscriptionsService.updateRunStatus(run, SubscriptionStatus.finished, new Date());
         await SubscriptionsService.updateSubscriptionStatus(sub, SubscriptionStatus.finished, nextRun);
