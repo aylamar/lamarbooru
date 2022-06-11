@@ -79,7 +79,7 @@ export async function generateTagConnectQuery(tags?: string[]): Promise<tagConne
     for (const i in tags) {
         let tag = tags[i].replace(/ /g, '_');
         const namespace = await getNamespace(tag);
-        tag = tag.replace(/^.*:/, '');
+        tag = tag.replace(/^(.*?):/, '');
 
         connectQuery.push(<tagConnectQuery>{
             where: { tag_namespace: { tag: tag, namespace: namespace } },
