@@ -1,6 +1,5 @@
 import cors from 'cors';
 import express from 'express';
-import path from 'path';
 //@ts-ignore
 import { handler } from '../client/handler.js';
 import routeController from './routes/route.controller.js';
@@ -29,8 +28,8 @@ try {
 }
 
 // we check if the directories exist above, so || '' is needed here
-export const fileBasePath = path.join(path.parse(process.cwd()).root, process.env.FILES_DIRECTORY || './public/files');
-export const thumbnailBasePath = path.join(path.parse(process.cwd()).root, process.env.THUMBNAILS_DIRECTORY || './publicthumbnails');
+export const fileBasePath = process.env.FILES_DIRECTORY || './public/files';
+export const thumbnailBasePath = process.env.THUMBNAILS_DIRECTORY || './publicthumbnails';
 
 const server = express();
 const port = process.env.PORT || 3000;
