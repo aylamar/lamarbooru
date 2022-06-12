@@ -1,11 +1,42 @@
 import cors from 'cors';
 import express from 'express';
 import path from 'path';
+import { Logger } from 'winston';
 //@ts-ignore
 import { handler } from '../client/handler.js';
 import routeController from './routes/route.controller.js';
 import { SubscriptionsService } from './services/subscription.service.js';
 import { TrashService } from './services/trash.service.js';
+import { prodLogger, devLogger } from './services/logger.service.js';
+
+export let logger: Logger;
+if (process.env.NODE_ENV === 'development') {
+    logger = devLogger;
+} else {
+    logger = prodLogger;
+}
+
+logger.info('Starting server...');
+
+const reqEnvVars = [
+    { var: 'DATABASE_URL', value: process.env.DATABASE_URL },
+    { var: 'VITE_BASE_URL', value: process.env.VITE_BASE_URL },
+    { var: 'FILES_DIRECTORY', value: process.env.FILES_DIRECTORY },
+    { var: 'THUMBNAILS_DIRECTORY', value: process.env.THUMBNAILS_DIRECTORY },
+]
+
+try {
+    for (const envVar of reqEnvVars) {
+        if (!envVar.value) throw new Error(`Environment variable ${envVar.var} is not set`);
+    }
+} catch (err) {
+    logger.error(err);
+    process.exit(1);
+}
+
+// we check if the directories exist above, so || '' is needed here
+export const fileBasePath = path.join(path.parse(process.cwd()).root, process.env.FILES_DIRECTORY || './public/files');
+export const thumbnailBasePath = path.join(path.parse(process.cwd()).root, process.env.THUMBNAILS_DIRECTORY || './publicthumbnails');
 
 const server = express();
 const port = process.env.PORT || 3000;
@@ -14,13 +45,6 @@ const port = process.env.PORT || 3000;
 server.use(cors({
     origin: '*',
 }));
-
-// use path to get list of files in directory
-if (!process.env.FILES_DIRECTORY) throw new Error('FILES_DIRECTORY environment variable is not set');
-export const fileBasePath = path.join(path.parse(process.cwd()).root, process.env.FILES_DIRECTORY);
-
-if (!process.env.THUMBNAILS_DIRECTORY) throw new Error('THUMBNAILS_DIRECTORY environment variable is not set');
-export const thumbnailBasePath = path.join(path.parse(process.cwd()).root, process.env.THUMBNAILS_DIRECTORY);
 
 // Set location of public files & set cache
 const short = 7 * 24 * 60 * 60 * 1000;
@@ -41,4 +65,4 @@ new SubscriptionsService();
 new TrashService();
 
 server.listen(port);
-console.log(`Server listening on port ${ port }`);
+logger.info(`Server listening on port ${ port }`);
