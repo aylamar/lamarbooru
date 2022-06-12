@@ -4,7 +4,7 @@
 
     const ratingArr = ['explicit', 'questionable', 'safe'];
     let rating = $file.rating;
-    let sourceUrl = $file.source;
+    let sourceUrls = $file.sources;
 
     let tagArr = [];
     for (const i in $file.tags) {
@@ -13,6 +13,11 @@
         } else {
             tagArr.push(`${ $file.tags[i].namespace }:${ $file.tags[i].tag }`);
         }
+    }
+
+    let urlArr = [];
+    for (const i in sourceUrls) {
+        urlArr.push(sourceUrls[i].url);
     }
 
     // sort tagArr:
@@ -44,13 +49,13 @@
     });
 
     let joinedTags = tagArr.join('\n');
+    let joinSourceUrls = urlArr.join('\n');
 
     // send the file to the server
     async function saveFile(e) {
         e.preventDefault();
-        // needed due to typescript not recognizing .value
-        //@ts-ignore
-        let tags = document.getElementById('tags').value.split('\n');
+        let tags = (<HTMLInputElement>document.getElementById('tags')).value.split('\n');
+        let sources = (<HTMLInputElement>document.getElementById('sources')).value.split('\n');
 
         // send the put to the server
         const res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/file/${ $file.id }`, {
@@ -59,7 +64,7 @@
             mode: 'cors',
             body: JSON.stringify({
                 tags: tags,
-                source: sourceUrl,
+                source: sources,
                 rating: rating,
             }),
         });
@@ -79,15 +84,18 @@
     </div>
     <div class="w-5/6">
         <p class="pb-2"><span class="font-bold">Note</span>: Tags should be seperated by a new line</p>
-        <textarea class="w-full text-slate-400 bg-slate-800 px-3 py-2 rounded-md h-40" id="tags"
+        <textarea class="w-full text-slate-400 bg-slate-800 px-3 py-2 rounded-md h-64" id="tags"
                   spellcheck="false">{joinedTags}</textarea>
     </div>
 
     <div class="w-5/6">
         <div class="pb-4">
             <p class="pb-2 font-bold">Source</p>
-            <input bind:value={sourceUrl} class="w-text-slate-400 bg-slate-800 px-3 py-2 rounded-md w-full" type="url">
+            <p class="pb-2"><span class="font-bold">Note</span>: Sources should be seperated by a new line</p>
+            <textarea class="w-full text-slate-400 bg-slate-800 px-3 py-2 rounded-md h-28" id="sources"
+                      spellcheck="false">{joinSourceUrls}</textarea>
         </div>
+
         <div class="pb-4">
             <p class="font-bold">Rating</p>
             <div class="flex place-content-evenly">
