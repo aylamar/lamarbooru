@@ -4,13 +4,13 @@ import schedule from 'node-schedule';
 import path from 'path';
 import { validate } from 'uuid';
 import { fileBasePath, thumbnailBasePath } from '../server.js';
-import { deleteFile, updateFileStatus } from '../utils/fileUtils.js';
-import prisma from '../utils/prisma.js';
+import { deleteFile, updateFileStatus } from '../utils/file.util.js';
+import prisma from '../utils/prisma.util.js';
 
 export class TrashService {
     private dailyRunning: boolean;
     private weeklyRunning: boolean;
-    private readonly deleteMisplacedFiles: boolean
+    private readonly deleteMisplacedFiles: boolean;
 
     constructor() {
         this.dailyRunning = false;
@@ -28,6 +28,69 @@ export class TrashService {
         });
     }
 
+    /*
+        Returns an array of folders from a provided path
+        @param sourcePath: path to search
+        @returns: array of folders
+     */
+    private static getFoldersFromPath(sourcePath: string) {
+        return fs.readdirSync(sourcePath, { withFileTypes: true });
+    }
+
+    /*
+        Returns a list of all files in a provided path
+        @param sourcePath: path to search
+        @param folderName: name of the folder in the provided source path to search
+        @returns: array of files
+     */
+    private static getFilesFromPath(sourcePath: string, folder: string) {
+        return fs.readdirSync(path.join(sourcePath, folder), { withFileTypes: true });
+    }
+
+    /*
+        Returns a list of files that are in the trash that are older than 7 days
+        @returns: array of Files
+     */
+    private static async findOldTrash() {
+        const now = new Date();
+        const date = new Date(now.getDate() - 7);
+
+        return await prisma.file.findMany({
+            where: {
+                AND: [{ updateDate: { lt: date } }, { status: FileStatus.trash }],
+            },
+        });
+    }
+
+    /*
+        Deletes all files in the trash that are older than 7 days
+     */
+    private static async deleteOldTrash() {
+        console.log('Deleting files that have been in the trash for more than 7 days...');
+        const oldTrash = await TrashService.findOldTrash();
+
+        // if there are no old trash files, return
+        if (!oldTrash) {
+            console.log('Found no files in the trash that are older than 7 days');
+            return;
+        }
+
+        for (const file of oldTrash) {
+            const updatedFile = await updateFileStatus(file.id, FileStatus.deleted);
+            if (!updatedFile) {
+                console.log(`Error updating file status of ${ file.id }`);
+                continue;
+            }
+
+            const deletedFile = await deleteFile(file.filename);
+            if (!deletedFile) console.log(`Error deleting file ${ file.id }`);
+        }
+        return;
+    }
+
+    /*
+        This will clean the file directories of files that are not in the database.
+     */
     private async cleanFileDirectories() {
         const baseDirectories = [fileBasePath, thumbnailBasePath];
 
@@ -79,48 +142,9 @@ export class TrashService {
         return;
     }
 
-    private static getFoldersFromPath(sourcePath: string) {
-        return fs.readdirSync(sourcePath, { withFileTypes: true });
-    }
-
-    private static getFilesFromPath(sourcePath: string, folder: string) {
-        return fs.readdirSync(path.join(sourcePath, folder), { withFileTypes: true });
-    }
-
-    private static async findOldTrash() {
-        const now = new Date();
-        const date = new Date(now.getDate() - 7);
-
-        return await prisma.file.findMany({
-            where: {
-                AND: [{ updateDate: { lt: date } }, { status: FileStatus.trash }],
-            },
-        });
-    }
-
-    private static async deleteOldTrash() {
-        console.log('Deleting files that have been in the trash for more than 7 days...');
-        const oldTrash = await TrashService.findOldTrash();
-
-        // if there are no old trash files, return
-        if (!oldTrash) {
-            console.log('Found no files in the trash that are older than 7 days');
-            return;
-        }
-
-        for (const file of oldTrash) {
-            const updatedFile = await updateFileStatus(file.id, FileStatus.deleted);
-            if (!updatedFile) {
-                console.log(`Error updating file status of ${ file.id }`);
-                continue;
-            }
-
-            const deletedFile = await deleteFile(file.filename);
-            if (!deletedFile) console.log(`Error deleting file ${ file.id }`);
-        }
-        return;
-    }
-
+    /*
+        Daily maintenance runner
+     */
     private async runDailyMaintenance() {
         if (this.dailyRunning) return;
 
@@ -130,6 +154,9 @@ export class TrashService {
         return;
     }
 
+    /*
+        Weekly maintenance runner
+     */
     private async runWeeklyMaintenance() {
         if (this.weeklyRunning) return;
 

@@ -1,6 +1,6 @@
 import { FileStatus } from '@prisma/client';
 import { Request, Response } from 'express';
-import prisma from '../../../utils/prisma.js';
+import prisma from '../../../utils/prisma.util.js';
 
 export async function getStats(req: Request, res: Response) {
     let files = await prisma.file.aggregate({

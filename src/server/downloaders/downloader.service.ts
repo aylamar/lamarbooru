@@ -7,11 +7,12 @@ import {
     generateTagConnectQuery,
     generateUrlConnectQuery,
     getFileExtensionFromURL,
-    getFileHash, getFileSize,
+    getFileHash,
+    getFileSize,
     getRating,
     isValidExtension,
     writeFile,
-} from '../utils/fileUtils.js';
+} from '../utils/file.util.js';
 import DanbooruService from './sites/danbooru.js';
 
 export class DownloaderService {

@@ -23,8 +23,8 @@ import {
     urlConnectQuery,
     urlDisconnectQuery,
     writeFile,
-} from '../../../utils/fileUtils.js';
-import prisma from '../../../utils/prisma.js';
+} from '../../../utils/file.util.js';
+import prisma from '../../../utils/prisma.util.js';
 import { booruSchema, fileSchema, idSchema, tagsSchema } from './file.validation.js';
 
 export async function uploadFileHandler(req: Request, res: Response) {

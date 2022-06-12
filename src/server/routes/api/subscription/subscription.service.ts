@@ -1,6 +1,6 @@
 import { Interval, Site } from '@prisma/client';
 import { Request, Response } from 'express';
-import prisma from '../../../utils/prisma.js';
+import prisma from '../../../utils/prisma.util.js';
 import { logIdSchema, newSubscriptionSchema, subscriptionIdSchema } from './subscription.validation.js';
 
 interface newSubscriptionPayload {

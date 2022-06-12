@@ -1,7 +1,10 @@
 import { Request, Response } from 'express';
-import prisma from '../../../utils/prisma.js';
+import prisma from '../../../utils/prisma.util.js';
 import { tagSchema } from './tag.validation.js';
 
+/*
+    Gets a list of all tags starting with the provided string
+ */
 export async function tagSearchHandler(req: Request, res: Response) {
     let tagData: { tag: string };
     try {

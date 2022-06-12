@@ -4,7 +4,7 @@ import fs from 'fs';
 import sharp from 'sharp';
 import { v4 as uuid } from 'uuid';
 import { fileBasePath, thumbnailBasePath } from '../server.js';
-import prisma from './prisma.js';
+import prisma from './prisma.util.js';
 
 const allowedExtensions = ['png', 'jpg', 'jpeg'];
 
@@ -344,6 +344,11 @@ export async function deleteFile(filename: string) {
     }
 }
 
+/*
+    Updates a file by id with the provided status
+    @param id: id of the file to update the status of
+    @param status: FileStatus to update the file's status to
+ */
 export async function updateFileStatus(id: number, status: FileStatus) {
     return await prisma.file.update({
         where: { id: id },

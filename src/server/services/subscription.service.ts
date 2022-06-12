@@ -1,6 +1,6 @@
 import { Interval, Site, Subscription, SubscriptionRun, SubscriptionStatus, UrlStatus } from '@prisma/client';
 import { DownloaderService } from '../downloaders/downloader.service.js';
-import prisma from '../utils/prisma.js';
+import prisma from '../utils/prisma.util.js';
 
 export class SubscriptionsService {
     private downloaderService: DownloaderService;
@@ -16,6 +16,11 @@ export class SubscriptionsService {
         setInterval(() => this.runWaitingSubscriptions(), 15 * 60 * 1000);
     }
 
+    /*
+        Returns the next run for the given subscription.
+        @param interval: Interval of the subscription
+        @returns Date: next run date
+     */
     private static async getNextRunDate(interval: Interval): Promise<Date> {
         const now = new Date();
         switch (interval) {
@@ -30,21 +35,29 @@ export class SubscriptionsService {
         }
     }
 
+    /*
+        Returns the updated count for the given run.
+        @param run: Current SubscriptionRun
+        @param status: UrlStatus to update count for
+     */
     private static async getCount(run: SubscriptionRun, status: UrlStatus) {
         switch (status) {
             case UrlStatus.downloaded:
                 return { downloadedUrlCount: run.downloadedUrlCount + 1 };
-            case UrlStatus.skipped:
-                return { skippedUrlCount: run.skippedUrlCount + 1 };
             case UrlStatus.failed:
                 return { failedUrlCount: run.failedUrlCount + 1 };
             default:
-                return run;
+                return { skippedUrlCount: run.skippedUrlCount + 1 };
+
         }
     }
 
+    /*
+        Starts a new subscription run.
+        @param sub: Subscription to create new run for
+        @returns SubscriptionRun: newly created subscription run
+     */
     private static async startNewSubscriptionRun(sub: Subscription): Promise<SubscriptionRun> {
-        // create new run
         return await prisma.subscriptionRun.create({
             data: {
                 site: sub.site,
@@ -54,7 +67,14 @@ export class SubscriptionsService {
         });
     }
 
-    private static async updateSubscriptionStatus(sub: Subscription, status: SubscriptionStatus, nextRun?: Date) {
+    /*
+        Updates a subscription status
+        @param sub: Subscription to update
+        @param status: SubscriptionStatus to update to
+        @param nextRun?: Date to start the next run
+        @returns Subscription: updated subscription
+     */
+    private static async updateSubscriptionStatus(sub: Subscription, status: SubscriptionStatus, nextRun?: Date): Promise<Subscription> {
         if (nextRun) {
             return prisma.subscription.update({
                 where: { id: sub.id },
@@ -71,8 +91,13 @@ export class SubscriptionsService {
         }
     }
 
+    /*
+        Updates the status of a subscription run.
+        @param run: SubscriptionRun to update
+        @param status: SubscriptionStatus to update to
+        @param finishTime?: Date to set the finish time to
+     */
     private static async updateRunStatus(subRun: SubscriptionRun, status: SubscriptionStatus, finishTime?: Date): Promise<SubscriptionRun> {
-        // update run
         let data: object = { status: status };
         if (finishTime) {
             data = {
@@ -90,7 +115,15 @@ export class SubscriptionsService {
         });
     }
 
-    private static async updateRunCounts(run: SubscriptionRun, url: string, status: UrlStatus, fileId?: number) {
+    /*
+        Add a new entry to a subscription run.
+        @param run: SubscriptionRun to add entry to
+        @param url: URL of the file to add to the log
+        @param status: UrlStatus of what happened with the file
+        @param fileId?: ID of the file in the database
+        @returns SubscriptionRun: updated subscription run
+     */
+    private static async updateRunCounts(run: SubscriptionRun, url: string, status: UrlStatus, fileId?: number): Promise<SubscriptionRun> {
         const data = await SubscriptionsService.getCount(run, status);
 
         return await prisma.subscriptionRun.update({
@@ -109,7 +142,13 @@ export class SubscriptionsService {
         );
     }
 
-    private static async updateRunPage(run: SubscriptionRun, pageNumber: number) {
+    /*
+        Updates the current page of a subscription run
+        @param run: SubscriptionRun to update
+        @param pageNumber: Number of the page most recently processed
+        @returns SubscriptionRun: updated subscription run
+     */
+    private static async updateRunPage(run: SubscriptionRun, pageNumber: number): Promise<SubscriptionRun> {
         return await prisma.subscriptionRun.update({
             where: { id: run.id },
             data: {
@@ -118,7 +157,11 @@ export class SubscriptionsService {
         });
     }
 
-    private static async getRunningSubscriptionRuns() {
+    /*
+        Gets a list of all running subscription runs
+        @returns SubscriptionRun[]: list of running subscription runs
+     */
+    private static async getRunningSubscriptionRuns(): Promise<SubscriptionRun[]> {
         return await prisma.subscriptionRun.findMany({
             where: {
                 status: SubscriptionStatus.running,
@@ -126,6 +169,11 @@ export class SubscriptionsService {
         });
     }
 
+    /*
+        Gets the most recent url from a resumed subscription run
+        @param run: SubscriptionRun to get url from
+        @returns url?: url of the most recent file
+     */
     private static async getMostRecentUrl(sub: Subscription): Promise<string|undefined> {
         const log = await prisma.subscriptionLog.findFirst({
             where: {
@@ -138,6 +186,11 @@ export class SubscriptionsService {
         return log?.url;
     }
 
+    /*
+        Checks to see if a url exists in the database
+        @param url: url to check
+        @returns urls?: array of matching urls that exist in the database
+     */
     private static async checkIfURLInDatabase(url: string) {
         return await prisma.url.findFirst({
             where: {
@@ -146,6 +199,10 @@ export class SubscriptionsService {
         });
     }
 
+    /*
+        Checks to see if there are any waiting subscriptions
+        @returns Subscriptions[]: list of waiting subscriptions
+     */
     private static async getWaitingSubscriptions(): Promise<Subscription[]> {
         return await prisma.subscription.findMany({
             where: {
@@ -167,6 +224,11 @@ export class SubscriptionsService {
         });
     }
 
+    /*
+        Gets a list of all subscriptions by tag
+        @param tag: list of tags to get subscriptions for
+        @param site: site to get subscriptions for
+     */
     public async getSubscriptionByTag(tag: string[], site: Site): Promise<Subscription | null> {
         return await prisma.subscription.findUnique({
             where: {
@@ -175,6 +237,9 @@ export class SubscriptionsService {
         });
     }
 
+    /*
+        Restarts any previously running subscriptions
+     */
     private async init() {
         const runningRuns = await SubscriptionsService.getRunningSubscriptionRuns();
         for (const run of runningRuns) {
@@ -191,6 +256,9 @@ export class SubscriptionsService {
         this.isRunning = false;
     }
 
+    /*
+        Starts any waiting subscriptions
+     */
     private async runWaitingSubscriptions() {
         if (this.isRunning) return;
         this.isRunning = true;
@@ -211,6 +279,13 @@ export class SubscriptionsService {
         this.isRunning = false;
     }
 
+    /*
+        Runs a subscription
+        @param run: SubscriptionRun being run
+        @param limit: Maximum number of files to download process per run
+        @param blacklist: List of blacklisted tags
+        @param prevUrl?: url of the most recent file processed if run is being resumed
+     */
     private async processSubscription(run: SubscriptionRun, limit: number, blacklist: string[], prevUrl?: string) {
         let skippedInARow = 0;
         let prevImg = '';
@@ -295,6 +370,12 @@ export class SubscriptionsService {
         }
     }
 
+    /*
+        Runs a subscription and generates a run for it
+        @param sub: Subscription to run
+        @param run: SubscriptionRun if this is a resumed run
+        @param prevUrl?: url of the most recent file processed if run is being resumed
+     */
     private async subscriptionRunner(sub: Subscription, run?: SubscriptionRun, prevUrl?: string) {
         console.log(`starting subscription: ${ sub.tags.join(' ') } on ${ sub.site }`);
         // if run is not provided, this is a new run so a new run must be created
