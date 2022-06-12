@@ -15,7 +15,7 @@ export class SubscriptionsService {
         void this.init();
 
         // start the subscription scheduler
-        schedule.scheduleJob({}, async () => {
+        schedule.scheduleJob('*/15 * * * *', async () => {
             void await this.runWaitingSubscriptions();
         });
     }
