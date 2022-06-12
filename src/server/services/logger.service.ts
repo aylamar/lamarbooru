@@ -1,11 +1,14 @@
+import { Logger } from 'winston';
 import { createLogger, format, transports } from 'winston';
 const { combine, timestamp, colorize, printf } = format;
 
-const logFormat = printf(({ level, message, stack, timestamp }) => {
-    return `${timestamp} ${level}: ${stack || message}`;
+const logFormat = printf(({ label, level, message, stack, timestamp }) => {
+    let service = ''
+    if (label) service = `[${label}] `;
+    return `${timestamp} ${level}: ${service}${stack || message}`;
 });
 
-export const prodLogger = createLogger({
+const prodLogger = createLogger({
     level: 'info',
     format: combine(
         colorize(),
@@ -20,7 +23,7 @@ export const prodLogger = createLogger({
     ],
 });
 
-export const devLogger = createLogger({
+const devLogger = createLogger({
     level: 'debug',
     format: combine(
         colorize(),
@@ -32,3 +35,11 @@ export const devLogger = createLogger({
         new transports.Console()
     ],
 });
+
+export function getLogger(): Logger {
+    if (process.env.NODE_ENV === 'development') {
+        return devLogger;
+    } else {
+        return prodLogger;
+    }
+}

@@ -1,33 +1,27 @@
 import cors from 'cors';
 import express from 'express';
 import path from 'path';
-import { Logger } from 'winston';
 //@ts-ignore
 import { handler } from '../client/handler.js';
 import routeController from './routes/route.controller.js';
+import { getLogger } from './services/logger.service.js';
 import { SubscriptionsService } from './services/subscription.service.js';
 import { TrashService } from './services/trash.service.js';
-import { prodLogger, devLogger } from './services/logger.service.js';
 
-export let logger: Logger;
-if (process.env.NODE_ENV === 'development') {
-    logger = devLogger;
-} else {
-    logger = prodLogger;
-}
+export const logger = getLogger();
 
-logger.info('Starting server...');
+logger.info('Starting server...', { label: 'server' });
 
 const reqEnvVars = [
     { var: 'DATABASE_URL', value: process.env.DATABASE_URL },
     { var: 'VITE_BASE_URL', value: process.env.VITE_BASE_URL },
     { var: 'FILES_DIRECTORY', value: process.env.FILES_DIRECTORY },
     { var: 'THUMBNAILS_DIRECTORY', value: process.env.THUMBNAILS_DIRECTORY },
-]
+];
 
 try {
     for (const envVar of reqEnvVars) {
-        if (!envVar.value) throw new Error(`Environment variable ${envVar.var} is not set`);
+        if (!envVar.value) throw new Error(`Environment variable ${ envVar.var } is not set`);
     }
 } catch (err) {
     logger.error(err);
@@ -65,4 +59,4 @@ new SubscriptionsService();
 new TrashService();
 
 server.listen(port);
-logger.info(`Server listening on port ${ port }`);
+logger.info(`Server listening on port ${ port }`, { label: 'server' });

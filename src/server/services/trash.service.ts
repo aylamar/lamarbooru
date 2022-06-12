@@ -3,7 +3,7 @@ import fs from 'fs';
 import schedule from 'node-schedule';
 import path from 'path';
 import { validate } from 'uuid';
-import { fileBasePath, thumbnailBasePath } from '../server.js';
+import { fileBasePath, logger, thumbnailBasePath } from '../server.js';
 import { deleteFile, updateFileStatus } from '../utils/file.util.js';
 import prisma from '../utils/prisma.util.js';
 
@@ -22,6 +22,7 @@ export class TrashService {
             await this.runDailyMaintenance();
         });
 
+        //{ hour: 5, dayOfWeek: 2 }
         // every tuesday at 5am, run weekly maintenance
         schedule.scheduleJob({ hour: 5, dayOfWeek: 2 }, async () => {
             await this.runWeeklyMaintenance();
@@ -66,24 +67,24 @@ export class TrashService {
         Deletes all files in the trash that are older than 7 days
      */
     private static async deleteOldTrash() {
-        console.log('Deleting files that have been in the trash for more than 7 days...');
+        logger.info('Deleting files that have been in the trash for more than 7 days...', { label: 'trash' });
         const oldTrash = await TrashService.findOldTrash();
 
         // if there are no old trash files, return
-        if (!oldTrash) {
-            console.log('Found no files in the trash that are older than 7 days');
+        if (oldTrash.length === 0) {
+            logger.info('Found no files in the trash that are older than 7 days', { label: 'trash' });
             return;
         }
 
         for (const file of oldTrash) {
             const updatedFile = await updateFileStatus(file.id, FileStatus.deleted);
             if (!updatedFile) {
-                console.log(`Error updating file status of ${ file.id }`);
+                logger.info(`Error updating file status of ${ file.id }`, { label: 'trash' });
                 continue;
             }
 
             const deletedFile = await deleteFile(file.filename);
-            if (!deletedFile) console.log(`Error deleting file ${ file.id }`);
+            if (!deletedFile) logger.error(`Error deleting file ${ file.id }`, { label: 'trash' });
         }
         return;
     }
@@ -97,6 +98,7 @@ export class TrashService {
         // iterate through base directories, looking for sub folders
         for (const directory of baseDirectories) {
             const folders = TrashService.getFoldersFromPath(directory);
+            logger.info(`Found ${ folders.length } folders in ${ directory }. Processing each folder now...`, { label: 'trash' });
 
             // iterate through sub folders, looking for files
             for (const folder of folders) {
@@ -120,21 +122,22 @@ export class TrashService {
                     const filename = file.name.slice(0, -path.extname(file.name).length);
                     const isValid = validate(filename);
                     if (!isValid) {
-                        console.log(`Found file named ${ file.name } in ${ directory }/${ folder.name } that is not in the database`);
+                        logger.info(`Found file named ${ file.name } in ${ directory }\\${ folder.name } that is not in the database and is not a UUID`, { label: 'trash' });
                         continue;
                     }
 
                     // do not delete any files if deleteMisplacedFiles is false
                     if (!this.deleteMisplacedFiles) {
-                        console.log(`Found file named ${ file.name } in ${ directory }/${ folder.name } that is not in the database`);
+                        logger.info(`Found file named ${ file.name } in ${ directory }\\${ folder.name } that is not in the database`, { label: 'trash' });
                         continue;
                     }
 
                     try {
                         fs.unlinkSync(path.join(directory, folder.name, file.name));
-                        console.log(`Found file named ${ file.name } in ${ directory }/${ folder.name } that is not in the database, so it has been deleted`);
+                        logger.info(`Found file named ${ file.name } in ${ directory }\\${ folder.name } that is not in the database, so it has been deleted`, { label: 'trash' });
                     } catch (err) {
-                        console.log(`Error deleting file ${ file.name }`);
+                        logger.error(`Error deleting file ${ file.name }`, { label: 'trash' });
+                        logger.error(err);
                     }
                 }
             }
