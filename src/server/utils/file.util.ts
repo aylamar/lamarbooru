@@ -118,14 +118,35 @@ export async function generateUrlConnectQuery(urls: string[]): Promise<urlConnec
  */
 export async function generateTagDisconnectQuery(tags: string[], fileTags: tag[]): Promise<tagDisconnectQuery[]> {
     let disconnectQuery: tagDisconnectQuery[] = [];
+    const cleanedTags = await stripNamespace(tags);
+
     for (const i in fileTags) {
-        if (!tags.includes(fileTags[i].tag)) {
+        if (!cleanedTags.includes(fileTags[i].tag)) {
             disconnectQuery.push({
                 id: fileTags[i].id,
             });
         }
     }
+
     return disconnectQuery;
+}
+
+/*
+    Strips the namespace from a tag
+    @param tags: Tags to strip namespace from
+    @returns Array of tags without namespace
+ */
+async function stripNamespace(tags: string[]): Promise<string[]> {
+    let tagArr: string[] = [];
+    for (const i in tags) {
+        const namespace = await getNamespace(tags[i]);
+
+        let cleanedTag = tags[i];
+        if (namespace != Namespace.meta) cleanedTag = tags[i].replace(/^(.*?):/, '');
+
+        tagArr.push(cleanedTag);
+    }
+    return tagArr;
 }
 
 /*
