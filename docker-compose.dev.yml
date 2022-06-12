@@ -21,7 +21,7 @@ services:
     ports:
         - "6969:6969"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
       - PORT=6969
       - DATABASE_URL=postgresql://postgres:postgres@lamarbooru-postgres:5432/postgres?schema=postgres
       - FILES_DIRECTORY=/files
