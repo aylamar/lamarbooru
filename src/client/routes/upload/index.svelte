@@ -1,13 +1,14 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { file } from '../../lib/stores/file';
+    import { hostname } from '../../lib/stores/general';
+    import { callAPI } from '../../lib/utils/api';
 
-    let booruUrl = ""
-    $: allowBooru = false
+    let booruUrl = '';
+    $: allowBooru = false;
 
     async function checkBooru() {
-        console.log('hit')
-        let parsedUrl: string | URL = ''
+        let parsedUrl: string | URL = '';
         try {
             parsedUrl = new URL(booruUrl);
         } catch (err) {
@@ -21,22 +22,22 @@
                 return allowBooru = false;
         }
     }
+
     async function handleBooru() {
-        const res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/file`, {
-            method: 'POST',
-            credentials: "include",
-            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "http://localhost*" },
-            mode: "cors",
-            body: JSON.stringify({
-                url: booruUrl,
-            })
-        })
-        if (res.ok) {
-            $file = await res.json()
-            await goto("/posts/" + $file.id)
-        } else {
-            return res.status
-        }
+        const body = JSON.stringify({ url: booruUrl });
+        await callAPI({host: $hostname, endpoint: '/file/booru', method: 'POST', body: body,
+            callback: async (res: Response) => {
+                if (res.status === 200) {
+                    const data = await res.json();
+                    if (data.success) {
+                        file.set(data.file);
+                        goto(`/file/${ data.file.id }`);
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            },
+        });
     }
 </script>
 
@@ -44,8 +45,8 @@
     <div class="max-w-2xl rounded-lg">
         <div class="m-4 w-80">
             <span class="inline-block mb-2 font-bold text-lg pb-2">Import Booru Image</span>
-            <input bind:value={booruUrl} on:paste={checkBooru} on:input={checkBooru}
-                   class="text-left px-4 h-12 ring-1 w-full ring-slate-900/10 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm rounded-t-lg dark:bg-slate-800 dark:ring-0 dark:text-slate-300 dark:highlight-white/5 dark:hover:bg-slate-700"
+            <input bind:value={booruUrl} class="text-left px-4 h-12 ring-1 w-full ring-slate-900/10 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm rounded-t-lg dark:bg-slate-800 dark:ring-0 dark:text-slate-300 dark:highlight-white/5 dark:hover:bg-slate-700" on:input={checkBooru}
+                   on:paste={checkBooru}
             />
             <button class="w-full px-4 py-2 text-white bg-sky-500 rounded-b-lg shadow-xl disabled:bg-slate-700"
                     disabled={!allowBooru}

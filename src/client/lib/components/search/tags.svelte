@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { fade } from 'svelte/transition';
     import type { Tag } from '../../stores/file';
 
     export let tags: Tag[] = [];
@@ -28,30 +29,33 @@
         }
     };
 
-    let processedTags: processedTag[] = [];
-    for (let tag of tags) {
-        processedTags.push({
+    // let processedTags: processedTag[] = [];
+    $: processedTags = tags.map(tag => {
+        return {
             tag: tag.tag,
             namespace: tag.namespace,
-            displayTag: `${ tag.namespace }:${ tag.tag }`,
+            displayTag: tag.tag,
             count: tag._count.files,
             color: getColor(tag.namespace),
-        });
-    }
+        };
+    });
 </script>
 
 <div class="tags">
     <div class="text-xl font-bold">
-        <h3>Tags</h3>
+        <h3 transition:fade>Tags</h3>
     </div>
-    <ul class="xs">
-        {#each processedTags as tag}
-            <li>
-                <a href="/files/?tags={tag.tag}" class={tag.color}>{tag.tag.replace(/_/g, ' ')}</a> <span
-                    class="text-slate-500">{tag.count}</span>
-            </li>
-        {/each}
-    </ul>
+    {#if tags}
+        <p></p>
+        <ul class="xs">
+            {#each processedTags as tag}
+                <li transition:fade>
+                    <a href="/files/?tags={tag.tag}" class={tag.color}>{tag.tag.replace(/_/g, ' ')}</a> <span
+                        class="text-slate-500">{tag.count}</span>
+                </li>
+            {/each}
+        </ul>
+    {/if}
 </div>
 
 <style>

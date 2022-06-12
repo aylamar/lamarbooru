@@ -11,7 +11,7 @@ export const params = writable<Params>({
     idx: 1,
 });
 
-type tagData = {
+export type tagData = {
     tag: string,
     _count: number,
     namespace: string,

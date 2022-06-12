@@ -1,6 +1,8 @@
 <script lang="ts">
-    import type { File } from '../../stores/file';
+    import { page } from '$app/stores';
     import { file } from '../../stores/file';
+    import { hostname } from '../../stores/general';
+    import { callAPI } from '../../utils/api';
 
     const ratingArr = ['explicit', 'questionable', 'safe'];
     let rating = $file.rating;
@@ -57,24 +59,21 @@
         let tags = (<HTMLInputElement>document.getElementById('tags')).value.split('\n');
         let sources = (<HTMLInputElement>document.getElementById('sources')).value.split('\n');
 
-        // send the put to the server
-        const res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/file/${ $file.id }`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': 'http://localhost*' },
-            mode: 'cors',
-            body: JSON.stringify({
-                tags: tags,
-                source: sources,
-                rating: rating,
-            }),
+        const body = JSON.stringify({
+            tags: tags,
+            source: sources,
+            rating: rating,
         });
-        const parsedJson: File = await res.json();
-        if (res.ok) {
-            $file = parsedJson;
-            return res.status;
-        } else {
-            return res.status;
-        }
+
+        await callAPI({
+            host: $hostname, endpoint: `/api/file/${ $page.params.id }`, method: 'PUT', body: body,
+            callback: async (res) => {
+                if (res.ok) {
+                    $file = await res.json();
+                    return res.status;
+                }
+            },
+        });
     }
 </script>
 

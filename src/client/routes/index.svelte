@@ -1,20 +1,31 @@
-<script context="module" lang="ts">
-    import { stats } from '../lib/stores/stats';
-
-
-    export async function load({ fetch }) {
-        const res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/database/stats`);
-        stats.set(await res.json());
-        return {
-            stats: res.status,
-        };
-    }
-</script>
-
 <script lang="ts">
-    import { Tag } from '../lib/stores/file';
-    import { params, derivedParams, tags } from '../lib/stores/search';
     import { goto } from '$app/navigation';
+    import { onMount } from 'svelte';
+    import { Tag } from '../lib/stores/file';
+    import { hostname } from '../lib/stores/general';
+    import { derivedParams, params, tags } from '../lib/stores/search';
+    import { stats } from '../lib/stores/stats';
+    import { callAPI } from '../lib/utils/api';
+
+    $: loading = true;
+
+    // on component mount, fetch the initial data
+    onMount(async () => {
+        try {
+            await callAPI({ host: $hostname, endpoint: '/api/database/stats', method: 'GET',
+                callback: async (res) => {
+                    stats.set(await res.json());
+                },
+            });
+            loading = false;
+            return { status: 200 };
+        } catch (e) {
+            stats.set({ tags: -1, files: -1, fileSize: 0 });
+            return {
+                stats: e.status,
+            };
+        }
+    });
 
     export let handleOnSubmit = (e) => {
         e.preventDefault();
@@ -36,9 +47,13 @@
         if (!$params.searchParams) return tags.set([]);
         const param = $params.searchParams.split(' ').pop();
         if (!param) return tags.set([]);
-        const res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/tag/search/${ param }`);
-        const parsedTags: Tag[] = await res.json();
-        tags.set(parsedTags.slice(0, 5));
+        await callAPI({
+            host: $hostname, endpoint: `/api/tag/search/${ param }`, method: 'GET',
+            callback: async (res: Response) => {
+                const parsedTags: Tag[] = await res.json();
+                tags.set(parsedTags.slice(0, 5));
+            },
+        });
         return;
     }
 
@@ -81,14 +96,16 @@
             {/if}
         </form>
 
-        <div class="grid grid-cols-3">
-            <span class="text-center">{$stats.files} Files</span>
-            {#if $stats.fileSize / 1024 > 1024}
-                <span class="text-center">{Math.round($stats.fileSize / 1024 / 1024 * 100) / 100} GB</span>
-            {:else}
-                <span class="text-center">{Math.round($stats.fileSize / 1024 * 100) / 100} MB</span>
-            {/if}
-            <span class="text-center">{$stats.tags} Tags</span>
-        </div>
+        {#if loading === false}
+            <div class="grid grid-cols-3">
+                <span class="text-center">{$stats.files} Files</span>
+                {#if $stats.fileSize / 1024 > 1024}
+                    <span class="text-center">{Math.round($stats.fileSize / 1024 / 1024 * 100) / 100} GB</span>
+                {:else}
+                    <span class="text-center">{Math.round($stats.fileSize / 1024 * 100) / 100} MB</span>
+                {/if}
+                <span class="text-center">{$stats.tags} Tags</span>
+            </div>
+        {/if}
     </div>
 </div>

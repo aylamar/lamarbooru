@@ -8,7 +8,7 @@
         // get first two characters of file name
         const firstTwoChars = fileName.substring(0, 2);
         // img url = first two characters of file name/file name
-        return `${ import.meta.env.VITE_BASE_URL }public/thumbs/${ firstTwoChars }/${ fileName }`;
+        return (import.meta.env.VITE_BASE_URL || '') + `/public/thumbs/${ firstTwoChars }/${ fileName }`;
     }
 </script>
 

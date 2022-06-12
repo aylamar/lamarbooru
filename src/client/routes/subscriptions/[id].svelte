@@ -1,25 +1,22 @@
-<script context="module" lang="ts">
-    import type { Subscription } from '../../lib/stores/subscription';
-    import { subscription } from '../../lib/stores/subscription';
-
-    export async function load({ fetch, params }) {
-        const id = params.id;
-        const res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/subscription/${ id }`);
-        const parsedJson: Subscription = await res.json();
-
-        if (res.ok) {
-            subscription.set(parsedJson);
-            return { status: 200 };
-        }
-
-        return {
-            status: res.status,
-            error: new Error(res.statusText),
-        };
-    }
-</script>
-
 <script lang="ts">
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+    import { hostname } from '../../lib/stores/general';
+    import { subscription } from '../../lib/stores/subscription';
+    import { callAPI } from '../../lib/utils/api';
+
+    onMount(async () => {
+        await callAPI({
+            host: $hostname, endpoint: `/api/subscription/${ $page.params.id }`, method: 'GET',
+            callback: async (res) => {
+                if (res.ok) {
+                    subscription.set(await res.json());
+                }
+            },
+        });
+    });
+
+
     const formatDateTime = (date) => {
         // return yyyy/mm/dd hh:mm
         let d = new Date(date),

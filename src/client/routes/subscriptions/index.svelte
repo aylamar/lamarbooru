@@ -1,24 +1,18 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import type { Subscription } from '../../lib/stores/subscription';
+    import { hostname } from '../../lib/stores/general';
     import { subscriptions } from '../../lib/stores/subscriptions';
+    import { callAPI } from '../../lib/utils/api';
 
     onMount(async () => {
-
-        let res: Response = await fetch(`${ import.meta.env.VITE_BASE_URL }api/subscription`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': 'http://localhost*' },
-            mode: 'cors',
+        await callAPI({
+            host: $hostname, endpoint: '/api/subscription', method: 'GET',
+            callback: async (res) => {
+                if (res.ok) {
+                    subscriptions.set(await res.json());
+                }
+            },
         });
-        const data: Subscription[] = await res.json();
-        if (res.ok) {
-            subscriptions.set(data);
-        } else {
-            return {
-                status: res.status,
-                error: res.statusText,
-            };
-        }
     });
 
     const formatDate = (date) => {

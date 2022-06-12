@@ -1,54 +1,38 @@
-<script context="module" lang="ts">
-    import type { File } from '../../lib/stores/file';
-    import { files, params } from '../../lib/stores/search';
-
-    export async function load({ fetch, url }) {
-        const param: string = url.searchParams.get('tags');
-        let res: Response;
-
-        if (param) {
-            res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/file/search/1?tags=${ param }`);
-        } else {
-            res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/file/search/1`);
-        }
-
-        if (res.ok) {
-            params.set({
-                searchParams: param,
-                idx: 1,
-            });
-
-            const filesVar: File[] = await res.json();
-            files.set(filesVar);
-            return { status: 200 };
-        } else {
-            return {
-                status: res.status,
-                error: new Error(res.statusText),
-            };
-        }
-    }
-</script>
-
 <script lang="ts">
-    import { derivedTags } from '../../lib/stores/search';
-    import Tags from '../../lib/components/search/tags.svelte';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
     import Search from '../../lib/components/search/search.svelte';
+    import Tags from '../../lib/components/search/tags.svelte';
     import Thumbnail from '../../lib/components/search/thumbnail.svelte';
+    import { hostname } from '../../lib/stores/general';
+    import { derivedTags, files, params } from '../../lib/stores/search';
+    import { callAPI } from '../../lib/utils/api';
+
+    onMount(async () => {
+        let param = $page.url.searchParams.get('tags');
+        if (!param) param = '';
+        $files = [];
+        params.set({
+            searchParams: param,
+            idx: 1,
+        });
+        void await fetchFiles();
+    });
 
     async function fetchFiles() {
-        let res: Response;
+        let endpoint = `/api/file/search/${ $params.idx }`;
+        if ($params.searchParams) endpoint += `?tags=${ $params.searchParams }`;
+        $params.idx = $params.idx + 32;
 
-        if ($params.searchParams) {
-            res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/file/search/${ $params.idx + 32 }?tags=${ $params.searchParams }`);
-        } else {
-            res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/file/search/${ $params.idx + 32 }`);
-        }
+        await callAPI({
+            host: $hostname, endpoint: endpoint, method: 'GET',
+            callback: async (res) => {
+                if (res.ok) {
+                    $files = [...$files, ...await res.json()];
+                }
+            },
+        });
 
-        if (res.ok) {
-            $params.idx = $params.idx + 32;
-            $files = [...$files, ...await res.json()];
-        }
     }
 
     let intersectionObserver;
@@ -84,7 +68,9 @@
 <div class="flex-none space-x-4 md:flex">
     <div class="w-60 sidebar">
         <Search searchParams={$params.searchParams}/>
-        <Tags tags={$derivedTags}/>
+        {#if $derivedTags.length > 0}
+            <Tags tags={$derivedTags}/>
+        {/if}
     </div>
 
     <div class="flex flex-auto flex-wrap">

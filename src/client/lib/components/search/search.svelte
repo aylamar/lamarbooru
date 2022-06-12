@@ -1,16 +1,31 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { Tag } from '../../stores/file';
-    import { derivedParams, params, tags } from '../../stores/search';
+    import { hostname } from '../../stores/general';
+    import { files, params, tags } from '../../stores/search';
+    import { callAPI } from '../../utils/api';
 
-    export let handleOnSubmit = (e) => {
+    export let handleOnSubmit = async (e) => {
         e.preventDefault();
 
         if ($params.searchParams) {
-            goto(`/files?tags=${ $derivedParams }`);
-            return {
-                status: 200,
-            };
+            files.set([]);
+            $params.idx = 1;
+            await goto(`/files?tags=${ $params.searchParams }`, { replaceState: true });
+            let endpoint = `/api/file/search/${ $params.idx }`;
+            if ($params.searchParams) endpoint += `?tags=${ $params.searchParams }`;
+
+            await callAPI({
+                host: $hostname, endpoint: endpoint, method: 'GET',
+                callback: async (res) => {
+                    if (res.ok) {
+                        $params.idx = $params.idx + 32;
+                        $files = [...$files, ...await res.json()];
+                    }
+                },
+            });
+
+            return { status: 200 };
         } else {
             goto('/files');
             return {
@@ -23,9 +38,13 @@
         if (!$params.searchParams) return tags.set([]);
         const param = $params.searchParams.split(' ').pop();
         if (!param) return tags.set([]);
-        const res = await fetch(`${ import.meta.env.VITE_BASE_URL }api/tag/search/${ param }`);
-        const parsedTags: Tag[] = await res.json();
-        tags.set(parsedTags.slice(0, 5));
+        await callAPI({
+            host: $hostname, endpoint: `/api/tag/search/${ param }`, method: 'GET',
+            callback: async (res: Response) => {
+                const parsedTags: Tag[] = await res.json();
+                tags.set(parsedTags.slice(0, 5));
+            },
+        });
         return;
     }
 
@@ -34,7 +53,7 @@
         const param = $params.searchParams.split(' ');
         param.pop();
         param.push(tag);
-        tags.set([])
+        tags.set([]);
         $params.searchParams = param.join(' ') + ' ';
     }
 
