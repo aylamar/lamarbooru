@@ -56,7 +56,7 @@
     <div class="grid content-center md:w-1/2 md:max-w-lg">
         <a class="text-4xl font-bold text-center pb-3" href="/files">Lamarbooru</a>
 
-        <div class="flex justify-center space-x-3">
+        <div class="flex justify-center space-x-3 pb-3">
             <a class="text-center font-bold" href="/files">Files</a>
             <a class="text-center font-bold" href="/subscriptions">Subscriptions</a>
         </div>
