@@ -13,23 +13,17 @@ logger.info('Starting server...', { label: 'server' });
 
 const reqEnvVars = [
     { var: 'DATABASE_URL', value: process.env.DATABASE_URL },
-    { var: 'VITE_BASE_URL', value: process.env.VITE_BASE_URL },
-    { var: 'FILES_DIRECTORY', value: process.env.FILES_DIRECTORY },
-    { var: 'THUMBNAILS_DIRECTORY', value: process.env.THUMBNAILS_DIRECTORY },
 ];
 
 try {
-    for (const envVar of reqEnvVars) {
-        if (!envVar.value) throw new Error(`Environment variable ${ envVar.var } is not set`);
-    }
+    for (const envVar of reqEnvVars) if (!envVar.value) throw new Error(`Environment variable ${ envVar.var } is not set`);
 } catch (err) {
     logger.error(err);
     process.exit(1);
 }
 
-// we check if the directories exist above, so || '' is needed here
-export const fileBasePath = process.env.FILES_DIRECTORY || './public/files';
-export const thumbnailBasePath = process.env.THUMBNAILS_DIRECTORY || './publicthumbnails';
+export const fileBasePath = process.env.FILES_DIRECTORY || './files';
+export const thumbnailBasePath = process.env.THUMBNAILS_DIRECTORY || './thumbnails';
 
 const server = express();
 const port = process.env.PORT || 3000;
