@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import fs from 'fs';
 import sharp from 'sharp';
 import { v4 as uuid } from 'uuid';
-import { fileBasePath, thumbnailBasePath } from '../server.js';
+import { fileBasePath, logger, thumbnailBasePath } from '../server.js';
 import prisma from './prisma.util.js';
 
 const allowedExtensions = ['png', 'jpg', 'jpeg'];
@@ -360,7 +360,7 @@ export async function deleteFile(filename: string) {
         fs.unlinkSync(`${ thumbnailBasePath }/${ filePath }`);
         return true;
     } catch (err: any) {
-        console.log(err);
+        logger.error(err, { label: 'file' });
         return false;
     }
 }

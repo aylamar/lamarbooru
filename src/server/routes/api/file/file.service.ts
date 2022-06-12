@@ -165,7 +165,6 @@ export async function uploadBooruFile(req: Request, res: Response) {
         return res.status(400).send(err.details);
     }
     const site = await getSite(data.url);
-    console.log(site);
     if (site == Site.unknown || site == Site.pixiv) return res.status(400).send({ 'error': 'Invalid site' });
 
     const downloaderService = new DownloaderService();

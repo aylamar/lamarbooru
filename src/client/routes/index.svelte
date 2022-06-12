@@ -17,7 +17,6 @@
     import { goto } from '$app/navigation';
 
     export let handleOnSubmit = (e) => {
-        console.log('hit');
         e.preventDefault();
 
         if ($params.searchParams) {

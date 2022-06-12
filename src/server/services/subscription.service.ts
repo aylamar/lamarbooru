@@ -1,5 +1,7 @@
 import { Interval, Site, Subscription, SubscriptionRun, SubscriptionStatus, UrlStatus } from '@prisma/client';
+import schedule from 'node-schedule';
 import { DownloaderService } from '../downloaders/downloader.service.js';
+import { logger } from '../server.js';
 import prisma from '../utils/prisma.util.js';
 
 export class SubscriptionsService {
@@ -13,7 +15,9 @@ export class SubscriptionsService {
         void this.init();
 
         // start the subscription scheduler
-        setInterval(() => this.runWaitingSubscriptions(), 15 * 60 * 1000);
+        schedule.scheduleJob({}, async () => {
+            void await this.runWaitingSubscriptions();
+        });
     }
 
     /*
@@ -174,14 +178,14 @@ export class SubscriptionsService {
         @param run: SubscriptionRun to get url from
         @returns url?: url of the most recent file
      */
-    private static async getMostRecentUrl(sub: Subscription): Promise<string|undefined> {
+    private static async getMostRecentUrl(sub: Subscription): Promise<string | undefined> {
         const log = await prisma.subscriptionLog.findFirst({
             where: {
                 subscriptionRunId: sub.id,
             },
             orderBy: {
                 createDate: 'desc',
-            }
+            },
         });
         return log?.url;
     }
@@ -246,11 +250,11 @@ export class SubscriptionsService {
             // get subscription for run
             const sub = await this.getSubscriptionByTag(run.tags, run.site);
             if (!sub) {
-                console.log(`Subscription not found for run with id ${ run.id }.`);
+                logger.warn(`Subscription not found for run with id ${ run.id }.`, { label: 'subscription' });
                 continue;
             }
             const prevUrl = await SubscriptionsService.getMostRecentUrl(sub);
-
+            logger.info(`Resuming subscription run with id ${ run.id } for subscription ${ sub.id }.`, { label: 'subscription' });
             await this.subscriptionRunner(sub, run, prevUrl);
         }
         this.isRunning = false;
@@ -263,17 +267,18 @@ export class SubscriptionsService {
         if (this.isRunning) return;
         this.isRunning = true;
 
-        console.log('Checking for waiting subscriptions...');
+        logger.info('Checking for waiting subscriptions...', { label: 'subscription' });
         const waitingSubs = await SubscriptionsService.getWaitingSubscriptions();
         if (waitingSubs.length === 0) {
-            console.log('No waiting subscriptions found.');
+            logger.info('No waiting subscriptions found.', { label: 'subscription' });
             return;
         }
 
         for (const sub of waitingSubs) {
-            console.log(`Starting ${ sub.tags.join(' ') } on ${ sub.site }.`);
-            await this.subscriptionRunner(sub)
-            console.log(`Finished ${ sub.tags.join(' ') } on ${ sub.site }.`);
+            logger.info(`Starting ${ sub.tags.join(' ') } on ${ sub.site }.`, { label: 'subscription' });
+            logger.info(`Starting subscription: ${ sub.tags.join(' ') } on ${ sub.site }`, { label: 'subscription' });
+            await this.subscriptionRunner(sub);
+            logger.info(`Finished ${ sub.tags.join(' ') } on ${ sub.site }.`, { label: 'subscription' });
         }
 
         this.isRunning = false;
@@ -304,7 +309,7 @@ export class SubscriptionsService {
                 break;
             }
 
-            console.log(`Processing page ${ run.pageNumber }`);
+            logger.info(`Processing page ${ run.pageNumber } for run id ${ run.id } with ${ run.downloadedUrlCount } files downloaded so far`, { label: 'subscription' });
 
             for (const url of gallery) {
                 if (prevImg === 'skipped') skippedInARow++;
@@ -319,7 +324,7 @@ export class SubscriptionsService {
                 if (resumedRun && url !== prevUrl) continue;
                 if (resumedRun && url === prevUrl) {
                     resumedRun = false;
-                    continue
+                    continue;
                 }
 
                 // check to see if it exists
@@ -334,6 +339,7 @@ export class SubscriptionsService {
                 try {
                     const file = await this.downloaderService.downloadFileFromService(url, blacklist);
                     prevImg = file.status;
+                    logger.debug(`URL ${ url } was processed with the ${ file.status.toString() } status.`, { label: 'subscription' });
                     switch (file.status) {
                         case 'success':
                             run = await SubscriptionsService.updateRunCounts(run, url, UrlStatus.downloaded, file.file.id);
@@ -377,7 +383,6 @@ export class SubscriptionsService {
         @param prevUrl?: url of the most recent file processed if run is being resumed
      */
     private async subscriptionRunner(sub: Subscription, run?: SubscriptionRun, prevUrl?: string) {
-        console.log(`starting subscription: ${ sub.tags.join(' ') } on ${ sub.site }`);
         // if run is not provided, this is a new run so a new run must be created
         if (!run) {
             run = await SubscriptionsService.startNewSubscriptionRun(sub);
@@ -390,7 +395,6 @@ export class SubscriptionsService {
 
         await SubscriptionsService.updateRunStatus(run, SubscriptionStatus.finished, new Date());
         await SubscriptionsService.updateSubscriptionStatus(sub, SubscriptionStatus.finished, nextRun);
-        console.log(`finished subscription: ${ sub.tags.join(' ') } on ${ sub.site }`);
+        logger.info(`finished subscription: ${ sub.tags.join(' ') } on ${ sub.site }`, { label: 'subscription' });
     }
-
 }
