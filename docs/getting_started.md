@@ -1,10 +1,8 @@
 # Setting up Lamarbooru
 
-Currently, the only way to run Lamarbooru is to clone the repo, install everything with `npm i`, then run `npm run start`.
+## Building from source
 
-Eventually, the goal is to provide a docker image for easy setup/installation.
-
-## Required Environment Variables
+### Required Environment Variables
 
 * `PORT`: Port to run the webserver.
 * `DATABASE_URL`: Postgres connection string.
@@ -13,7 +11,7 @@ Eventually, the goal is to provide a docker image for easy setup/installation.
 * `THUMBNAILS_DIRECTORY`: Location on disk to store generated thumbnails.
 * `DELETE_MISPLACED_FILES`: Should be `true` or `false`. If `true`, any files in the two above directories that are not in the database and are named with a valid UUID will be deleted during weekly maintenance.
 
-### Example .env file
+#### Example .env file
 
 ```
 PORT=3000
@@ -24,7 +22,7 @@ THUMBNAILS_DIRECTORY="/Lamarbooru/thumbnails"
 DELETE_MISPLACED_FILES=true
 ```
 
-## Setup Process
+### Setup Process
 
 1. Clone the repo.
 2. Navigate to the directory that the repo was closed to.
@@ -36,3 +34,21 @@ DELETE_MISPLACED_FILES=true
 8. Navigate to the url that is printed into the console using a web browser of your choice to access the webserver.
 
 Note: If you opt to use the `docker-compose up` command for setting up Postgres, you can copy the example `.env` file.
+
+## Docker
+
+1. [Install Docker](https://www.docker.com/). If you're on Windows or Mac, you can use the [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+2. Download zip of the repository.
+3. Extract the zip to a location on your computer.
+4. Create a file named `.env` in the root of the folder that was extracted.
+5. In the file, add the following lines:
+```dotenv
+FILES_DIRECTORY="C:/path/to/store/files"
+THUMBNAILS_DIRECTORY="C:/path/to/store/thumbnails"
+DELETE_MISPLACED_FILES=true
+```
+6. Run the following command:
+```bash
+docker-compose up
+```
+7. Once everything is running, you can visit `http://localhost:6969` in your browser to access the client.
