@@ -1,4 +1,5 @@
-import fetch from 'node-fetch';
+import fetch, { Response } from 'node-fetch';
+import { logger } from '../../server.js';
 
 interface danbooruImage {
     id: number;
@@ -33,7 +34,8 @@ export default class DanbooruService {
         //select everything after /posts/
         const id = url.split('/posts/')[1];
 
-        const res: any = await fetch(`https://danbooru.donmai.us/posts/${ id }.json`);
+        const res: Response = await fetch(`https://danbooru.donmai.us/posts/${ id }.json`);
+        if (!res.ok) logger.debug(`${ url } returned ${ res.status }`, { label: 'downloader-danbooru' });
         const data: danbooruImage = await res.json();
         await DanbooruService.checkIfError(data);
         return data;
@@ -41,6 +43,7 @@ export default class DanbooruService {
 
     public async galleryGenerator(tags: string[], pageNumber: number): Promise<string[]> {
         const res: any = await fetch(`https://danbooru.donmai.us/posts.json?tags=${ tags.join('+') }&page=${ pageNumber }`);
+        if (!res.ok) logger.debug(`Gallery generator returned ${ res.status }`, { label: 'downloader-danbooru' });
         const data: danbooruImage[] = await res.json();
         try {
             await DanbooruService.checkIfError(data);
@@ -49,7 +52,10 @@ export default class DanbooruService {
             // links that contain "undefined" are not valid, so remove them
             return linkArr.filter(x => !x.includes('undefined'));
         } catch (e) {
-            if (e instanceof Error && e.message === 'No images found') return [];
+            if (e instanceof Error && e.message === 'No images found') {
+                logger.debug(`No images found for ${ tags.join('+') }`, { label: 'downloader-danbooru' });
+                return [];
+            }
             throw e;
         }
     }

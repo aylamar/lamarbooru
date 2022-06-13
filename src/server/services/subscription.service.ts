@@ -305,6 +305,7 @@ export class SubscriptionsService {
 
             // finish run if no files found
             if (gallery.length === 0) {
+                logger.debug(`Page number ${ run.pageNumber } returned an empty gallery for run id ${ run.id } on ${ run.site }. Finishing subscription run.`, { label: 'subscription' });
                 keepRunning = false;
                 break;
             }
@@ -315,7 +316,14 @@ export class SubscriptionsService {
                 if (prevImg === 'skipped') skippedInARow++;
                 else skippedInARow = 0;
 
-                if (skippedInARow >= 20 || run.downloadedUrlCount >= limit) {
+                if (skippedInARow >= 20) {
+                    logger.debug(`Finishing subscription run id ${ run.id } with ${ run.downloadedUrlCount } files downloaded due to 20 images skipped in a row.`, { label: 'subscription' });
+                    keepRunning = false;
+                    break;
+                }
+
+                if (run.downloadedUrlCount >= limit) {
+                    logger.debug(`Finishing subscription run id ${ run.id } with ${ run.downloadedUrlCount } files downloaded due reaching the maximum download limit.`, { label: 'subscription' });
                     keepRunning = false;
                     break;
                 }
