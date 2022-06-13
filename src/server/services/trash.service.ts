@@ -18,13 +18,13 @@ export class TrashService {
         this.deleteMisplacedFiles = process.env.DELETE_MISPLACED_FILES === 'true';
 
         // every day at 2am, run daily maintenance
-        schedule.scheduleJob({ hour: 2 }, async () => {
+        schedule.scheduleJob({ hour: 2, minute: 0 }, async () => {
             await this.runDailyMaintenance();
         });
 
         //{ hour: 5, dayOfWeek: 2 }
         // every tuesday at 5am, run weekly maintenance
-        schedule.scheduleJob({ hour: 5, dayOfWeek: 2 }, async () => {
+        schedule.scheduleJob({ dayOfWeek: 2, hour: 5, minute: 0 }, async () => {
             await this.runWeeklyMaintenance();
         });
     }
