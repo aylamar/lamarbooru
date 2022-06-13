@@ -9,6 +9,7 @@
 * `VITE_BASE_URL`: Base URL for webserver, should be `https://localhost:3000/` for development. `/` can be used as well.
 * `FILES_DIRECTORY`: Location on disk to store uploaded files. 
 * `THUMBNAILS_DIRECTORY`: Location on disk to store generated thumbnails.
+* `POSTGRES_DATA_DIRECTORY`: Location on disk to store Postgres data.
 * `DELETE_MISPLACED_FILES`: Should be `true` or `false`. If `true`, any files in the two above directories that are not in the database and are named with a valid UUID will be deleted during weekly maintenance.
 
 #### Example .env file
@@ -19,6 +20,7 @@ DATABASE_URL="postgresql://postgres:very_secure_password_that_you_should_probabl
 VITE_BASE_URL=http://localhost:3000/
 FILES_DIRECTORY="/Lamarbooru/files"
 THUMBNAILS_DIRECTORY="/Lamarbooru/thumbnails"
+POSTGRES_DATA_DIRECTORY="/Lamarbooru/postgres_data"
 DELETE_MISPLACED_FILES=true
 ```
 
@@ -45,6 +47,7 @@ Note: If you opt to use the `docker-compose up` command for setting up Postgres,
 ```dotenv
 FILES_DIRECTORY="C:/path/to/store/files"
 THUMBNAILS_DIRECTORY="C:/path/to/store/thumbnails"
+POSTGRES_DATA_DIRECTORY="C:/path/to/store/postgres_data"
 DELETE_MISPLACED_FILES=true
 ```
 6. Run the following command:

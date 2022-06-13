@@ -3,6 +3,8 @@ services:
   db:
     container_name: lamarbooru-postgres
     image: postgres:14
+    volumes:
+      - ${POSTGRES_DATA_DIRECTORY}:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     environment:
