@@ -64,7 +64,6 @@
             {/if}
             <Information/>
             <Options/>
-            <button class="text-blue-400">Show original</button>
         </div>
         <div class="">
             {#if $fileSettings.isEditing}
