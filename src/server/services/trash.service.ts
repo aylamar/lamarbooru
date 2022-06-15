@@ -1,6 +1,7 @@
 import { FileStatus } from '@prisma/client';
 import fs from 'fs';
-import schedule from 'node-schedule';
+import cron from 'node-cron';
+// import schedule from 'node-schedule';
 import path from 'path';
 import { validate } from 'uuid';
 import { fileBasePath, logger, thumbnailBasePath } from '../server.js';
@@ -17,16 +18,13 @@ export class TrashService {
         this.weeklyRunning = false;
         this.deleteMisplacedFiles = process.env.DELETE_MISPLACED_FILES === 'true';
 
-        // every day at 2am, run daily maintenance
-        schedule.scheduleJob({ hour: 2, minute: 0 }, async () => {
-            await this.runDailyMaintenance();
-        });
+        cron.schedule('0 7 * * *', () => {
+            void this.runDailyMaintenance();
+        })
 
-        //{ hour: 5, dayOfWeek: 2 }
-        // every tuesday at 5am, run weekly maintenance
-        schedule.scheduleJob({ dayOfWeek: 2, hour: 5, minute: 0 }, async () => {
-            await this.runWeeklyMaintenance();
-        });
+        cron.schedule('0 9 * * 2', () => {
+            void this.runWeeklyMaintenance();
+        })
     }
 
     /*
@@ -149,7 +147,10 @@ export class TrashService {
         Daily maintenance runner
      */
     private async runDailyMaintenance() {
-        if (this.dailyRunning) return;
+        if (this.dailyRunning) {
+            logger.debug('Daily maintenance is already running, skipping.', { label: 'trash' });
+            return;
+        }
 
         this.dailyRunning = true;
         await TrashService.deleteOldTrash();
@@ -161,7 +162,10 @@ export class TrashService {
         Weekly maintenance runner
      */
     private async runWeeklyMaintenance() {
-        if (this.weeklyRunning) return;
+        if (this.weeklyRunning) {
+            logger.debug('Weekly maintenance is already running, skipping.', { label: 'trash' });
+            return;
+        }
 
         this.weeklyRunning = true;
         await this.cleanFileDirectories();

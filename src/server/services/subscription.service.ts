@@ -1,5 +1,5 @@
 import { Interval, Site, Subscription, SubscriptionRun, SubscriptionStatus, UrlStatus } from '@prisma/client';
-import schedule from 'node-schedule';
+import cron from 'node-cron';
 import { DownloaderService } from '../downloaders/downloader.service.js';
 import { logger } from '../server.js';
 import prisma from '../utils/prisma.util.js';
@@ -14,10 +14,9 @@ export class SubscriptionsService {
         // start subscriptions that were running when server was shut off
         void this.init();
 
-        // start the subscription scheduler
-        schedule.scheduleJob('*/15 * * * *', async () => {
-            void await this.runWaitingSubscriptions();
-        });
+        cron.schedule('*/15 * * * *', () => {
+            void this.runWaitingSubscriptions();
+        })
     }
 
     /*
@@ -264,13 +263,17 @@ export class SubscriptionsService {
         Starts any waiting subscriptions
      */
     private async runWaitingSubscriptions() {
-        if (this.isRunning) return;
+        if (this.isRunning) {
+            logger.info('Subscription service is already running, skipping.', { label: 'subscription' });
+            return;
+        }
         this.isRunning = true;
 
         logger.info('Checking for waiting subscriptions...', { label: 'subscription' });
         const waitingSubs = await SubscriptionsService.getWaitingSubscriptions();
         if (waitingSubs.length === 0) {
             logger.info('No waiting subscriptions found.', { label: 'subscription' });
+            this.isRunning = false;
             return;
         }
 
@@ -282,6 +285,7 @@ export class SubscriptionsService {
         }
 
         this.isRunning = false;
+        return
     }
 
     /*
@@ -378,7 +382,7 @@ export class SubscriptionsService {
                 }
 
                 // sleep for 1 second to not hammer servers
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 200));
             }
             run.pageNumber++;
         }
