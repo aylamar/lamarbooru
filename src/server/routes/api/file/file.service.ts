@@ -1,6 +1,7 @@
 import { FileStatus, Prisma, Rating, Site } from '@prisma/client';
 import { Request, Response } from 'express';
 import { DownloaderService } from '../../../downloaders/downloader.service.js';
+import { logger } from '../../../server.js';
 import {
     checkIfHashExists,
     createFile,
@@ -28,6 +29,7 @@ import prisma from '../../../utils/prisma.util.js';
 import { booruSchema, fileSchema, idSchema, tagsSchema } from './file.validation.js';
 
 export async function uploadFileHandler(req: Request, res: Response) {
+    const start = new Date();
     let data: {
         tags: string[],
         rating?: Rating,
@@ -64,6 +66,8 @@ export async function uploadFileHandler(req: Request, res: Response) {
     await writeFile(rawFile.buffer, fileName);
     const file = await createFile(fileName, hash, tagConnectQuery, sources, fileSize, rating);
 
+    const runtime = new Date().getTime() - start.getTime();
+    logger.debug(`Uploaded file ${fileName} in ${runtime}ms`);
     return res.status(200).send({ 'success': 'File uploaded', file: file });
 }
 
@@ -135,6 +139,7 @@ export async function updateFileHandler(req: Request, res: Response) {
 }
 
 export async function searchFileHandler(req: Request, res: Response) {
+    const start = new Date();
     let data: { id: number };
     let tagData: { tags?: string };
     try {
@@ -151,7 +156,9 @@ export async function searchFileHandler(req: Request, res: Response) {
     const files = await searchImages(page, tags);
     if (!files) return res.status(404).send({ 'error': 'No files found' });
 
-    res.status(200).send(files);
+    const runtime = new Date().getTime() - start.getTime();
+    logger.debug(`Search for ${tags?.join(' ')} completed in ${runtime}ms`);
+    return res.status(200).send(files);
 }
 
 export async function uploadBooruFile(req: Request, res: Response) {
