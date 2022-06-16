@@ -1,14 +1,13 @@
 import { FileStatus } from '@prisma/client';
 import fs from 'fs';
 import cron from 'node-cron';
-// import schedule from 'node-schedule';
 import path from 'path';
 import { validate } from 'uuid';
 import { fileBasePath, logger, thumbnailBasePath } from '../server.js';
 import { deleteFile, updateFileStatus } from '../utils/file.util.js';
 import prisma from '../utils/prisma.util.js';
 
-export class TrashService {
+export class MaintenanceService {
     private dailyRunning: boolean;
     private weeklyRunning: boolean;
     private readonly deleteMisplacedFiles: boolean;
@@ -66,7 +65,7 @@ export class TrashService {
      */
     private static async deleteOldTrash() {
         logger.info('Deleting files that have been in the trash for more than 7 days...', { label: 'trash' });
-        const oldTrash = await TrashService.findOldTrash();
+        const oldTrash = await MaintenanceService.findOldTrash();
 
         // if there are no old trash files, return
         if (oldTrash.length === 0) {
@@ -95,13 +94,13 @@ export class TrashService {
 
         // iterate through base directories, looking for sub folders
         for (const directory of baseDirectories) {
-            const folders = TrashService.getFoldersFromPath(directory);
+            const folders = MaintenanceService.getFoldersFromPath(directory);
             logger.info(`Found ${ folders.length } folders in ${ directory }. Processing each folder now...`, { label: 'trash' });
 
             // iterate through sub folders, looking for files
             for (const folder of folders) {
                 if (folder.isFile()) continue;
-                const files = TrashService.getFilesFromPath(directory, folder.name);
+                const files = MaintenanceService.getFilesFromPath(directory, folder.name);
 
                 // iterate through files, looking for files that do not exist in database
                 for (const file of files) {
@@ -153,7 +152,7 @@ export class TrashService {
         }
 
         this.dailyRunning = true;
-        await TrashService.deleteOldTrash();
+        await MaintenanceService.deleteOldTrash();
         this.dailyRunning = false;
         return;
     }

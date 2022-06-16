@@ -5,7 +5,7 @@ import { handler } from '../client/handler.js';
 import routeController from './routes/route.controller.js';
 import { getLogger } from './services/logger.service.js';
 import { SubscriptionsService } from './services/subscription.service.js';
-import { TrashService } from './services/trash.service.js';
+import { MaintenanceService } from './services/maintenance.service.js';
 
 export const logger = getLogger();
 
@@ -49,7 +49,7 @@ server.use(handler);
 
 // start misc services
 new SubscriptionsService();
-new TrashService();
+new MaintenanceService();
 
 server.listen(port);
 logger.info(`Server listening on port ${ port }`, { label: 'server' });
