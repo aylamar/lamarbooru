@@ -149,15 +149,18 @@ export async function searchFileHandler(req: Request, res: Response) {
         return res.status(400).send(err.details);
     }
 
+    let allowedStatuses: FileStatus[] = [FileStatus.inbox, FileStatus.archived]
+    if (req.route.path == '/trash/:id') allowedStatuses = [FileStatus.trash]
+
     const page = data.id;
     let tags: string[] | undefined;
     if (tagData.tags) tags = tagData.tags.split(' ');
 
-    const files = await searchImages(page, tags);
+    const files = await searchImages(page, allowedStatuses, tags);
     if (!files) return res.status(404).send({ 'error': 'No files found' });
 
     const runtime = new Date().getTime() - start.getTime();
-    logger.debug(`Search for ${tags?.join(' ')} completed in ${runtime}ms`);
+    logger.debug(`${req.route.path} for ${tags?.join(' ')} completed in ${runtime}ms`);
     return res.status(200).send(files);
 }
 
@@ -267,7 +270,16 @@ async function getFileById(id: number) {
     @param tags - the tags to search for
     @returns the page of images if found, otherwise empty array
  */
-async function searchImages(idx: number, tags?: string[]) {
+async function searchImages(idx: number, inclStatus: FileStatus[], tags?: string[]) {
+    // generate query where file contains one of the inclStatus
+    const statusQuery = inclStatus.map(status => ({ status: { equals: status } }));
+
+
+    // const statusNotQuery = exclStatus.map(status => {
+    //     return { NOT: { status: { not: status } } };
+    // })
+
+
     if (tags) {
         const tagQueryArr: tagQuery[] = tags.map((tag) => {
             return { tags: { some: { tag: { in: tag } } } };
@@ -277,11 +289,14 @@ async function searchImages(idx: number, tags?: string[]) {
             where: {
                 AND: [
                     {
-                        NOT: { status: FileStatus.deleted },
+                        OR: statusQuery,
                     },
-                    {
-                        NOT: { status: FileStatus.trash },
-                    },
+                    // {
+                    //     NOT: { status: FileStatus.deleted },
+                    // },
+                    // {
+                    //     NOT: { status: FileStatus.trash },
+                    // },
                     ...tagQueryArr,
                 ],
             },
@@ -303,14 +318,7 @@ async function searchImages(idx: number, tags?: string[]) {
     } else {
         return await prisma.file.findMany({
             where: {
-                AND: [
-                    {
-                        NOT: { status: FileStatus.deleted },
-                    },
-                    {
-                        NOT: { status: FileStatus.trash },
-                    },
-                ],
+                OR: statusQuery,
             },
             orderBy: {
                 id: 'desc',
