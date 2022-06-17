@@ -13,9 +13,8 @@
 
     async function handleTrash() {
         if (updatingTrash) return;
-        const currStatus = $file.status;
         let method;
-        if (currStatus === 'trash') {
+        if (!$file.trash) {
             method = 'PUT';
         } else {
             method = 'DELETE';
@@ -28,7 +27,7 @@
             method: method,
             callback: async (res: Response) => {
                 if (res.ok) {
-                    $file.status = currStatus === 'trash' ? 'inbox' : 'trash';
+                    $file.trash = !$file.trash;
                     updatingTrash = false;
                 } else {
                     updatingTrash = false;
@@ -50,7 +49,7 @@
             </a>
         </li>
         <li>
-            {#if $file.status === 'trash'}
+            {#if $file.trash === true}
                 <button class="text-blue-400" on:click={handleTrash}>Remove file from trash</button>
             {:else }
                 <button class="text-blue-400" on:click={handleTrash}>Add file to trash</button>

@@ -4,7 +4,6 @@ import {
     getFileHandler,
     searchFileHandler,
     trashFileHandler,
-    unTrashFileHandler,
     updateFileHandler,
     uploadBooruFile,
     uploadFileHandler,
@@ -21,7 +20,7 @@ router.get('/:id', getFileHandler);
 // PUT /api/file/:id to update image with new tags/data
 router.put('/:id', updateFileHandler);
 // PUT /api/file/trash/:id sets a file's status as "trash" to be deleted in a few days
-router.put('/trash/:id', unTrashFileHandler);
+router.put('/trash/:id', trashFileHandler);
 // DELETE /api/file/trash/:id sets a file's status as "trash" to be deleted in a few days
 router.delete('/trash/:id', trashFileHandler);
 // GET /api/file/search/:page to get a page of files

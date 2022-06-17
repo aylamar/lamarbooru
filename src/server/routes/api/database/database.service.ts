@@ -1,4 +1,3 @@
-import { FileStatus } from '@prisma/client';
 import { Request, Response } from 'express';
 import prisma from '../../../utils/prisma.util.js';
 
@@ -9,7 +8,7 @@ export async function getStats(req: Request, res: Response) {
         }, _count: {
             id: true,
         }, where: {
-            NOT: { status: FileStatus.deleted },
+            deleted: false,
         },
     });
     const tags = await prisma.tag.count();

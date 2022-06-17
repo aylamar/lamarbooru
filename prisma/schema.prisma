@@ -20,6 +20,8 @@ model File {
   tags             Tag[]
   sources          Url[]
   status           FileStatus        @default(inbox)
+  trash            Boolean           @default(false)
+  deleted          Boolean           @default(false)
   rating           Rating            @default(explicit)
   subscriptionLogs SubscriptionLog[]
 
@@ -99,8 +101,6 @@ model SubscriptionLog {
 enum FileStatus {
   archived
   inbox
-  trash
-  deleted
 }
 
 enum UrlStatus {

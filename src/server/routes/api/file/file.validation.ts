@@ -13,6 +13,7 @@ export const idSchema = Joi.object({
 export const searchSchema = Joi.object({
     tags: Joi.string().lowercase().optional(),
     status: Joi.string().lowercase().optional(),
+    trash: Joi.boolean().optional(),
 });
 
 export const booruSchema = Joi.object({

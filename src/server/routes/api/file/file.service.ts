@@ -21,7 +21,7 @@ import {
     tagConnectQuery,
     tagDisconnectQuery,
     updateFile,
-    updateFileStatus,
+    updateTrashStatus,
     urlConnectQuery,
     urlDisconnectQuery,
     writeFile,
@@ -142,7 +142,7 @@ export async function updateFileHandler(req: Request, res: Response) {
 export async function searchFileHandler(req: Request, res: Response) {
     const start = new Date();
     let data: { id: number };
-    let searchData: { tags?: string, status?: string };
+    let searchData: { tags?: string, status?: string, trash?: boolean };
     try {
         data = await idSchema.validateAsync(req.params);
         searchData = await searchSchema.validateAsync(req.query);
@@ -150,11 +150,12 @@ export async function searchFileHandler(req: Request, res: Response) {
         return res.status(400).send(err.details);
     }
 
+    // tag processing
     const page = data.id;
     let tags: string[] | undefined;
     if (searchData.tags) tags = searchData.tags.split(' ');
 
-    // let status: FileStatus[] = [FileStatus.inbox, FileStatus.archived]
+    // file status processing
     let parsedStatus: string[] | undefined;
     if (searchData.status) parsedStatus = searchData.status.split(' ');
 
@@ -172,7 +173,10 @@ export async function searchFileHandler(req: Request, res: Response) {
         status = [FileStatus.inbox, FileStatus.archived];
     }
 
-    const files = await searchImages(page, status, tags);
+    let trash: boolean | undefined;
+    if (searchData.trash) trash = searchData.trash;
+
+    const files = await searchImages(page, status, tags, trash);
     if (!files) return res.status(404).send({ 'error': 'No files found' });
 
     const runtime = new Date().getTime() - start.getTime();
@@ -207,40 +211,25 @@ export async function trashFileHandler(req: Request, res: Response) {
         return res.status(400).send(err.details);
     }
 
+    let trashStatus: boolean;
+    if (req.method === 'PUT') trashStatus = true;
+    else if (req.method === 'DELETE') trashStatus = false;
+    else return res.status(400).send({ 'error': 'Invalid method' });
+
     try {
         const file = await getFileById(data.id);
         if (!file) return res.status(404).send({ 'error': 'No files found' });
-        if (file.status === FileStatus.trash || file.status === FileStatus.deleted) return res.status(405).send({ 'error': 'File already in trash' });
+        if (!trashStatus && !file.trash) return res.status(405).send({ 'error': 'File already in trash' });
+        if (trashStatus && file.trash) return res.status(405).send({ 'error': 'File is not in trash' });
 
-        await updateFileStatus(data.id, FileStatus.trash);
+        await updateTrashStatus(data.id, trashStatus);
     } catch (err: any) {
         if (err instanceof Prisma.PrismaClientKnownRequestError) return res.status(404).send({ 'error': 'No files found' });
         return res.status(500).send({ 'error': 'Error updating file' });
     }
 
-    return res.status(202).send({ 'success': 'File moved to the trash' });
-}
-
-export async function unTrashFileHandler(req: Request, res: Response) {
-    let data: { id: number };
-    try {
-        data = await idSchema.validateAsync(req.params);
-    } catch (err: any) {
-        return res.status(400).send(err.details);
-    }
-
-    try {
-        const file = await getFileById(data.id);
-        if (!file) return res.status(404).send({ 'error': 'No files found' });
-        if (file.status != FileStatus.trash) return res.status(405).send({ 'error': 'File is not in trash' });
-
-        await updateFileStatus(data.id, FileStatus.inbox);
-    } catch (err: any) {
-        if (err instanceof Prisma.PrismaClientKnownRequestError) return res.status(404).send({ 'error': 'No files found' });
-        return res.status(500).send({ 'error': 'Error updating file' });
-    }
-
-    return res.status(202).send({ 'success': 'File has been removed from the trash and moved to inbox' });
+    if (!trashStatus) return res.status(200).send({ 'message': 'File added to trash' });
+    if (trashStatus) return res.status(200).send({ 'message': 'File removed from trash' });
 }
 
 /*
@@ -286,15 +275,9 @@ async function getFileById(id: number) {
     @param tags - the tags to search for
     @returns the page of images if found, otherwise empty array
  */
-async function searchImages(idx: number, inclStatus: FileStatus[], tags?: string[]) {
+async function searchImages(idx: number, inclStatus: FileStatus[], tags?: string[], trash: boolean = false) {
     // generate query where file contains one of the inclStatus
     const statusQuery = inclStatus.map(status => ({ status: { equals: status } }));
-
-
-    // const statusNotQuery = exclStatus.map(status => {
-    //     return { NOT: { status: { not: status } } };
-    // })
-
 
     if (tags) {
         const tagQueryArr: tagQuery[] = tags.map((tag) => {
@@ -304,15 +287,8 @@ async function searchImages(idx: number, inclStatus: FileStatus[], tags?: string
         return await prisma.file.findMany({
             where: {
                 AND: [
-                    {
-                        OR: statusQuery,
-                    },
-                    // {
-                    //     NOT: { status: FileStatus.deleted },
-                    // },
-                    // {
-                    //     NOT: { status: FileStatus.trash },
-                    // },
+                    { OR: statusQuery },
+                    { trash: { equals: trash } },
                     ...tagQueryArr,
                 ],
             },
@@ -334,11 +310,12 @@ async function searchImages(idx: number, inclStatus: FileStatus[], tags?: string
     } else {
         return await prisma.file.findMany({
             where: {
-                OR: statusQuery,
+                AND: [
+                    { OR: statusQuery },
+                    { trash: { equals: trash } },
+                ],
             },
-            orderBy: {
-                id: 'desc',
-            },
+            orderBy: { id: 'desc' },
             include: {
                 tags: {
                     select: {

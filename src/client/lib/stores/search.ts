@@ -38,11 +38,11 @@ export const derivedParams = derived(params, (params) => {
         let statusString = '';
         if (params.includeArchive) statusString += 'archived+';
         if (params.includeInbox) statusString += 'inbox+';
-        if (params.includeTrash) statusString += 'trash+';
-
         // join statuses together with + and remove last + if statusString is not 'archive+inbox+'
         if (statusString != '' && statusString != 'archive+inbox+') urlString += `&status=${ statusString.slice(0, -1) }`;
     }
+
+    if (params.includeTrash) urlString += '&trash=true';
 
     return urlString;
 });

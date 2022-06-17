@@ -377,14 +377,24 @@ export async function updateFileStatus(id: number, status: FileStatus) {
     });
 }
 
+export async function updateTrashStatus(id: number, status: boolean) {
+    return await prisma.file.update({
+        where: { id: id },
+        data: { trash: status },
+    });
+}
+
+export async function updateDeleteStatus(id: number, status: boolean) {
+    return await prisma.file.update({
+        where: { id: id },
+        data: { deleted: status },
+    });
+}
+
 export async function parseStatus(status: string) {
     switch (status) {
-        case 'trash':
-            return FileStatus.trash;
         case 'inbox':
             return FileStatus.inbox;
-        case 'deleted':
-            return FileStatus.deleted;
         case 'archived':
             return FileStatus.archived;
         default:

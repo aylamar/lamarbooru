@@ -1,10 +1,9 @@
-import { FileStatus } from '@prisma/client';
 import fs from 'fs';
 import cron from 'node-cron';
 import path from 'path';
 import { validate } from 'uuid';
 import { fileBasePath, logger, thumbnailBasePath } from '../server.js';
-import { deleteFile, updateFileStatus } from '../utils/file.util.js';
+import { deleteFile, updateDeleteStatus } from '../utils/file.util.js';
 import prisma from '../utils/prisma.util.js';
 
 export class MaintenanceService {
@@ -19,11 +18,11 @@ export class MaintenanceService {
 
         cron.schedule('0 7 * * *', () => {
             void this.runDailyMaintenance();
-        })
+        });
 
         cron.schedule('0 9 * * 2', () => {
             void this.runWeeklyMaintenance();
-        })
+        });
     }
 
     /*
@@ -55,7 +54,7 @@ export class MaintenanceService {
 
         return await prisma.file.findMany({
             where: {
-                AND: [{ updateDate: { lt: date } }, { status: FileStatus.trash }],
+                AND: [{ updateDate: { lt: date } }, { trash: true }],
             },
         });
     }
@@ -74,7 +73,7 @@ export class MaintenanceService {
         }
 
         for (const file of oldTrash) {
-            const updatedFile = await updateFileStatus(file.id, FileStatus.deleted);
+            const updatedFile = await updateDeleteStatus(file.id, true);
             if (!updatedFile) {
                 logger.info(`Error updating file status of ${ file.id }`, { label: 'trash' });
                 continue;

@@ -13,20 +13,22 @@ export type Source = {
     id: string,
     site: string,
     url: string,
-    status: string
+    status: string,
 }
 
 export type File = {
-    id: number;
-    filename: string;
-    createDate: string;
-    updateDate: string;
-    size: number;
-    sources: Source[];
-    status: string;
-    rating: string;
-    uploader: { username: string };
-    tags: Tag[];
+    id: number,
+    filename: string,
+    createDate: string,
+    updateDate: string,
+    size: number,
+    sources: Source[],
+    status: string,
+    trash: boolean,
+    deleted: boolean,
+    rating: string,
+    uploader: { username: string },
+    tags: Tag[],
 }
 
 export const file = writable({} as File);
