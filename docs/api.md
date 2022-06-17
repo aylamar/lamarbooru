@@ -191,12 +191,13 @@ Arguments:
 
 ### GET `/api/file/search/:page`
 
-_Get a page of 32 files using, optionally filtered by tag_
+_Get a page of 32 files, optionally filtered by tag_
 
 Parameters:
 
 * `page`: (required) The page number, must one or greater.
-* `tags`: (optional) The tag to filter by, any number of tags are supported and should be seperated by a space of a "+".
+* `tags`: (optional) The tag to filter by, any number of tags are supported and should be seperated by a "+".
+* `status`: (optional) The status of the file to filter by, defaults to inbox and archive. Any number of statuses are supported and should be seperated by "+".
 
 ```json title="Successful Reponse (200)"
 [

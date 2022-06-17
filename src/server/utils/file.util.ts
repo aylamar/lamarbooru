@@ -377,6 +377,21 @@ export async function updateFileStatus(id: number, status: FileStatus) {
     });
 }
 
+export async function parseStatus(status: string) {
+    switch (status) {
+        case 'trash':
+            return FileStatus.trash;
+        case 'inbox':
+            return FileStatus.inbox;
+        case 'deleted':
+            return FileStatus.deleted;
+        case 'archived':
+            return FileStatus.archived;
+        default:
+            throw new Error('Invalid status');
+    }
+}
+
 export interface tagConnectQuery {
     where: { tag_namespace: { tag: string, namespace: Namespace } };
     create: { tag: string, namespace: Namespace };

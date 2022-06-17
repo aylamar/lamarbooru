@@ -20,8 +20,6 @@ router.post('/', upload.single('file'), uploadFileHandler);
 router.get('/:id', getFileHandler);
 // PUT /api/file/:id to update image with new tags/data
 router.put('/:id', updateFileHandler);
-// GET /api/file/trash to get files in trash
-router.get('/trash/:id', searchFileHandler);
 // PUT /api/file/trash/:id sets a file's status as "trash" to be deleted in a few days
 router.put('/trash/:id', unTrashFileHandler);
 // DELETE /api/file/trash/:id sets a file's status as "trash" to be deleted in a few days

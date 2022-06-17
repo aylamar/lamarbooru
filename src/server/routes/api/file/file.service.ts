@@ -17,6 +17,7 @@ import {
     getRating,
     getSite,
     isValidMimeType,
+    parseStatus,
     tagConnectQuery,
     tagDisconnectQuery,
     updateFile,
@@ -26,7 +27,7 @@ import {
     writeFile,
 } from '../../../utils/file.util.js';
 import prisma from '../../../utils/prisma.util.js';
-import { booruSchema, fileSchema, idSchema, tagsSchema } from './file.validation.js';
+import { booruSchema, fileSchema, idSchema, searchSchema } from './file.validation.js';
 
 export async function uploadFileHandler(req: Request, res: Response) {
     const start = new Date();
@@ -67,7 +68,7 @@ export async function uploadFileHandler(req: Request, res: Response) {
     const file = await createFile(fileName, hash, tagConnectQuery, sources, fileSize, rating);
 
     const runtime = new Date().getTime() - start.getTime();
-    logger.debug(`Uploaded file ${fileName} in ${runtime}ms`);
+    logger.debug(`Uploaded file ${ fileName } in ${ runtime }ms`);
     return res.status(200).send({ 'success': 'File uploaded', file: file });
 }
 
@@ -141,26 +142,41 @@ export async function updateFileHandler(req: Request, res: Response) {
 export async function searchFileHandler(req: Request, res: Response) {
     const start = new Date();
     let data: { id: number };
-    let tagData: { tags?: string };
+    let searchData: { tags?: string, status?: string };
     try {
         data = await idSchema.validateAsync(req.params);
-        tagData = await tagsSchema.validateAsync(req.query);
+        searchData = await searchSchema.validateAsync(req.query);
     } catch (err: any) {
         return res.status(400).send(err.details);
     }
 
-    let allowedStatuses: FileStatus[] = [FileStatus.inbox, FileStatus.archived]
-    if (req.route.path == '/trash/:id') allowedStatuses = [FileStatus.trash]
-
     const page = data.id;
     let tags: string[] | undefined;
-    if (tagData.tags) tags = tagData.tags.split(' ');
+    if (searchData.tags) tags = searchData.tags.split(' ');
 
-    const files = await searchImages(page, allowedStatuses, tags);
+    // let status: FileStatus[] = [FileStatus.inbox, FileStatus.archived]
+    let parsedStatus: string[] | undefined;
+    if (searchData.status) parsedStatus = searchData.status.split(' ');
+
+    let status: FileStatus[] = [];
+    if (parsedStatus) {
+        for (const i in parsedStatus) {
+            try {
+                status.push(await parseStatus(parsedStatus[i]));
+            } catch (err) {
+                return res.status(400).send({ 'error': `Invalid status ${ parsedStatus[i] }` });
+            }
+        }
+        status = status.filter((item, index) => status.indexOf(item) === index);
+    } else {
+        status = [FileStatus.inbox, FileStatus.archived];
+    }
+
+    const files = await searchImages(page, status, tags);
     if (!files) return res.status(404).send({ 'error': 'No files found' });
 
     const runtime = new Date().getTime() - start.getTime();
-    logger.debug(`${req.route.path} for ${tags?.join(' ')} completed in ${runtime}ms`);
+    logger.debug(`${ req.route.path } for ${ tags?.join(' ') } completed in ${ runtime }ms`);
     return res.status(200).send(files);
 }
 
