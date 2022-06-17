@@ -18,6 +18,8 @@ Parameters:
     "filename": "c3bb72a9-4cbe-4872-b7b2-bf9e27bfa3e8.jpeg",
     "hash": "85747e8865a35c3f44a1e5596b36f79d",
     "status": "inbox",
+    "trash": false,
+    "deleted": false,
     "rating": "safe",
     "sources": {
         "id": "86739154-6dd0-4e94-b8a8-b623c313228d",
@@ -198,6 +200,7 @@ Parameters:
 * `page`: (required) The page number, must one or greater.
 * `tags`: (optional) The tag to filter by, any number of tags are supported and should be seperated by a "+".
 * `status`: (optional) The status of the file to filter by, defaults to inbox and archive. Any number of statuses are supported and should be seperated by "+".
+* `trash`: (optional) Whether to filter by files in the trash or not, defaults to false.
 
 ```json title="Successful Reponse (200)"
 [
