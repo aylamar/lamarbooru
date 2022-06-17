@@ -74,7 +74,7 @@
         <ul class="xs">
             {#each processedTags as tag}
                 <li transition:fade>
-                    <a on:click={handleTagClick(tag.tag)} class={tag.color}>{tag.tag.replace(/_/g, ' ')}</a> <span
+                    <a on:click={handleTagClick(tag.tag)} class="{tag.color} hover:cursor-pointer">{tag.tag.replace(/_/g, ' ')}</a> <span
                         class="text-slate-500">{tag.count}</span>
                 </li>
             {/each}
