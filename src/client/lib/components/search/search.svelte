@@ -67,7 +67,7 @@
     </form>
 
     {#if $tags.length > 0}
-        <ul class="rounded-b-md bg-slate-700 w-60">
+        <ul class="rounded-b-md bg-slate-700 w-60 absolute">
             {#each $tags as tag}
                 <li class="w-text-slate-400 px-3 py-0.5 hover:bg-sky-800 hover:rounded-b-md "
                     on:click={updateSearchParams(tag.tag)}>
