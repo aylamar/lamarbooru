@@ -12,7 +12,8 @@
     // on component mount, fetch the initial data
     onMount(async () => {
         try {
-            await callAPI({ host: $hostname, endpoint: '/api/database/stats', method: 'GET',
+            await callAPI({
+                host: $hostname, endpoint: '/api/database/stats', method: 'GET',
                 callback: async (res) => {
                     stats.set(await res.json());
                 },
@@ -29,23 +30,16 @@
 
     export let handleOnSubmit = (e) => {
         e.preventDefault();
+        goto(`/files?${ $derivedParams }`);
+        return {
+            status: 200,
+        };
 
-        if ($params.searchParams) {
-            goto(`/files?tags=${ $derivedParams }`);
-            return {
-                status: 200,
-            };
-        } else {
-            goto('/files');
-            return {
-                status: 200,
-            };
-        }
     };
 
     async function searchTags() {
-        if (!$params.searchParams) return tags.set([]);
-        const param = $params.searchParams.split(' ').pop();
+        if (!$params.tagSearchParams) return tags.set([]);
+        const param = $params.tagSearchParams.split(' ').pop();
         if (!param) return tags.set([]);
         await callAPI({
             host: $hostname, endpoint: `/api/tag/search/${ param }`, method: 'GET',
@@ -59,11 +53,11 @@
 
     async function updateSearchParams(tag) {
         // remove the last param from the search params and replace with the new tag
-        const param = $params.searchParams.split(' ');
+        const param = $params.tagSearchParams.split(' ');
         param.pop();
         param.push(tag);
         tags.set([]);
-        $params.searchParams = param.join(' ') + ' ';
+        $params.tagSearchParams = param.join(' ') + ' ';
     }
 </script>
 
@@ -77,7 +71,7 @@
         </div>
 
         <form class="grid grid-cols-4 pb-3" on:input={searchTags} on:submit={handleOnSubmit}>
-            <input bind:value={$params.searchParams}
+            <input bind:value={$params.tagSearchParams}
                    class="w-text-slate-400 bg-slate-800 px-3 py-2 rounded-l-md col-span-3 shadow-sm"
                    placeholder="long_hair 1girl"
                    type="search">

@@ -5,23 +5,31 @@
     import Tags from '../../lib/components/search/tags.svelte';
     import Thumbnail from '../../lib/components/search/thumbnail.svelte';
     import { hostname } from '../../lib/stores/general';
-    import { derivedTags, files, params } from '../../lib/stores/search';
+    import { derivedParams, derivedTags, files, params } from '../../lib/stores/search';
     import { callAPI } from '../../lib/utils/api';
 
     onMount(async () => {
         let param = $page.url.searchParams.get('tags');
+        let status = $page.url.searchParams.get('status');
+        // split status into array
+        let parsedStatus: string[];
+        if (status) parsedStatus = status.split('+');
+
         if (!param) param = '';
         $files = [];
         params.set({
-            searchParams: param,
+            tagSearchParams: param,
+            searchSpecificStatus: status == 'archive+inbox',
+            includeArchive: parsedStatus && parsedStatus.includes('archive'),
+            includeInbox: parsedStatus && parsedStatus.includes('inbox'),
+            includeTrash: parsedStatus && parsedStatus.includes('trash'),
             idx: 1,
         });
         void await fetchFiles();
     });
 
     async function fetchFiles() {
-        let endpoint = `/api/file/search/${ $params.idx }`;
-        if ($params.searchParams) endpoint += `?tags=${ $params.searchParams }`;
+        let endpoint = `/api/file/search/${ $params.idx }?${ $derivedParams }`;
         $params.idx = $params.idx + 32;
 
         await callAPI({
@@ -67,9 +75,9 @@
 
 <div class="flex-none space-x-4 md:flex">
     <div class="w-60 sidebar">
-        <Search searchParams={$params.searchParams}/>
+        <Search searchParams={$params.tagSearchParams}/>
         {#if $derivedTags.length > 0}
-            <Tags tags={$derivedTags}/>
+            <Tags displayTags={$derivedTags}/>
         {/if}
     </div>
 

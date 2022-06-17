@@ -1,8 +1,12 @@
 <script lang="ts">
+    import { goto } from '$app/navigation';
     import { fade } from 'svelte/transition';
     import type { Tag } from '../../stores/file';
+    import { hostname } from '../../stores/general';
+    import { files, params, tags } from '../../stores/search';
+    import { callAPI } from '../../utils/api';
 
-    export let tags: Tag[] = [];
+    export let displayTags: Tag[] = [];
 
     type processedTag = {
         tag: string,
@@ -29,8 +33,28 @@
         }
     };
 
+    export let handleTagClick = async (tag: string) => {
+        await goto('/files?tags=' + tag, { replaceState: true });
+        let endpoint = `/api/file/search/1?tags=${ tag }`;
+
+        files.set([]);
+        tags.set([]);
+        $params.idx = 1;
+
+        await callAPI({
+            host: $hostname, endpoint: endpoint, method: 'GET',
+            callback: async (res) => {
+                if (res.ok) {
+                    $params.idx = $params.idx + 32;
+                    $files = [...$files, ...await res.json()];
+                }
+            },
+        });
+        return { status: 200 };
+    };
+
     // let processedTags: processedTag[] = [];
-    $: processedTags = tags.map(tag => {
+    $: processedTags = displayTags.map(tag => {
         return {
             tag: tag.tag,
             namespace: tag.namespace,
@@ -45,12 +69,12 @@
     <div class="text-xl font-bold">
         <h3 transition:fade>Tags</h3>
     </div>
-    {#if tags}
+    {#if displayTags}
         <p></p>
         <ul class="xs">
             {#each processedTags as tag}
                 <li transition:fade>
-                    <a href="/files/?tags={tag.tag}" class={tag.color}>{tag.tag.replace(/_/g, ' ')}</a> <span
+                    <a on:click={handleTagClick(tag.tag)} class={tag.color}>{tag.tag.replace(/_/g, ' ')}</a> <span
                         class="text-slate-500">{tag.count}</span>
                 </li>
             {/each}

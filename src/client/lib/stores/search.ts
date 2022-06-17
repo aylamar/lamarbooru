@@ -2,14 +2,25 @@ import { derived, writable } from 'svelte/store';
 import type { File, Tag } from './file';
 
 type Params = {
-    searchParams: string;
-    idx: number;
+    tagSearchParams: string,
+    searchSpecificStatus: boolean,
+    includeArchive: boolean,
+    includeInbox: boolean,
+    includeTrash: boolean,
+    idx: number,
 }
 
+
 export const params = writable<Params>({
-    searchParams: '',
+    tagSearchParams: '',
+    searchSpecificStatus: false,
+    includeArchive: true,
+    includeInbox: true,
+    includeTrash: false,
     idx: 1,
 });
+
+export const searchSpecificStatus = writable<boolean>(false);
 
 export type tagData = {
     tag: string,
@@ -18,8 +29,22 @@ export type tagData = {
     accumulator: number,
 }
 export const derivedParams = derived(params, (params) => {
-    if (params.searchParams == null) return '';
-    return params.searchParams.replace(/\s/g, '+');
+    let urlString = '';
+
+    if (params.tagSearchParams != null && params.tagSearchParams != '') urlString += `&tags=${ params.tagSearchParams.trim().replace(/\s/g, '+') }`;
+
+    // if searchSpecificStatus is false, do not bother
+    if (params.searchSpecificStatus) {
+        let statusString = '';
+        if (params.includeArchive) statusString += 'archived+';
+        if (params.includeInbox) statusString += 'inbox+';
+        if (params.includeTrash) statusString += 'trash+';
+
+        // join statuses together with + and remove last + if statusString is not 'archive+inbox+'
+        if (statusString != '' && statusString != 'archive+inbox+') urlString += `&status=${ statusString.slice(0, -1) }`;
+    }
+
+    return urlString;
 });
 
 export const files = writable<File[]>([]);
