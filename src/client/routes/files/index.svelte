@@ -17,16 +17,17 @@
         if (status) parsedStatus = status.split('+');
 
         if (!param) param = '';
-        $files = [];
         params.set({
             tagSearchParams: param,
             // searchSpecificStatus: status == 'archive+inbox',
-            includeArchive: parsedStatus && parsedStatus.includes('archive'),
+            includeArchive: parsedStatus && parsedStatus.includes('archived'),
             includeInbox: parsedStatus && parsedStatus.includes('inbox'),
             includeTrash: parsedStatus && parsedStatus.includes('trash'),
             isNavigating: true,
             idx: 1,
         });
+
+        if ($files.length != 0) return;
         void await fetchFiles();
     });
 
