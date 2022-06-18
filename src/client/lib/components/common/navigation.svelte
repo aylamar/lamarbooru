@@ -69,10 +69,10 @@
         {#if $page.url.pathname.includes('/files')}
             <div class="bg-slate-800 pl-2 py-0.5">
                 <div class="pl-4 sm:flex space-x-6 bg-slate-800">
-                    <a class="hover:cursor-pointer" on:click={handleFileClick()}>Files</a>
-                    <a class="hover:cursor-pointer" on:click={handleFileClick('archived')}>Archive</a>
-                    <a class="hover:cursor-pointer" on:click={handleFileClick('inbox')}>Inbox</a>
-                    <a class="hover:cursor-pointer" on:click={handleFileClick('trash')}>Trash</a>
+                    <span class="hover:cursor-pointer" on:click={handleFileClick()}>Files</span>
+                    <span class="hover:cursor-pointer" on:click={handleFileClick('archived')}>Archive</span>
+                    <span class="hover:cursor-pointer" on:click={handleFileClick('inbox')}>Inbox</span>
+                    <span class="hover:cursor-pointer" on:click={handleFileClick('trash')}>Trash</span>
                 </div>
             </div>
         {/if}
