@@ -1,7 +1,7 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
-    import { Tag } from '../lib/stores/file';
+    import type { Tag } from '../lib/stores/file';
     import { hostname } from '../lib/stores/general';
     import { derivedParams, params, tags } from '../lib/stores/search';
     import { stats } from '../lib/stores/stats';

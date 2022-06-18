@@ -1,7 +1,8 @@
 <script context="module" lang="ts">
     import { browser } from '$app/env';
+    import type { SvelteToastOptions } from '@zerodevx/svelte-toast';
+    import { SvelteToast } from '@zerodevx/svelte-toast';
     import { currUrl, hostname } from '../lib/stores/general';
-    import { SvelteToast, SvelteToastOptions } from '@zerodevx/svelte-toast';
 
     export async function load({ url }) {
         if (browser) {
@@ -14,7 +15,7 @@
 
     const options: SvelteToastOptions = {
         duration: 2000,
-    }
+    };
 </script>
 
 <script lang="ts">
@@ -22,7 +23,7 @@
     import Navigation from '../lib/components/common/navigation.svelte';
 </script>
 
-<SvelteToast {options} />
+<SvelteToast {options}/>
 
 {#if $currUrl !== "/"}
     <Navigation/>
