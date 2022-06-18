@@ -8,17 +8,15 @@
 
     export let handleFileClick = async (status?: string) => {
         let endpoint = `/api/file/search/1`;
-        if (status) {
-            params.set({
-                tagSearchParams: '',
-                // searchSpecificStatus: false,
-                includeInbox: status === 'inbox',
-                includeTrash: status === 'trash',
-                includeArchive: status === 'archived',
-                isNavigating: true,
-                idx: 1,
-            });
-        }
+        params.set({
+            tagSearchParams: '',
+            // searchSpecificStatus: false,
+            includeInbox: status === 'inbox',
+            includeTrash: status === 'trash',
+            includeArchive: status === 'archived',
+            isNavigating: true,
+            idx: 1,
+        });
 
         let path: string;
         if (status === 'archived') {
