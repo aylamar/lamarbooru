@@ -1,6 +1,7 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { page } from '$app/stores';
+    import { toast } from '@zerodevx/svelte-toast';
     import { hostname } from '../../stores/general';
     import { files, pageSize, params, tags } from '../../stores/search';
     import { callAPI } from '../../utils/api';
@@ -39,11 +40,16 @@
         await callAPI({
             host: $hostname, endpoint: endpoint, method: 'GET',
             callback: async (res) => {
-                if (res.ok) {
-                    $params.isNavigating = false;
-                    $params.idx = $params.idx + $pageSize;
-                    $files = [...$files, ...await res.json()];
-                }
+                if (!res.ok) return toast.push(`Error ${ res.statusText }`, {
+                    theme: {
+                        '--toastBackground': '#F56565',
+                        '--toastBarBackground': '#C53030'
+                    }
+                });
+
+                $params.isNavigating = false;
+                $params.idx = $params.idx + $pageSize;
+                $files = [...$files, ...await res.json()];
             },
         });
         return { status: 200 };

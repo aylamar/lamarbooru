@@ -1,5 +1,6 @@
 <script lang="ts">
     import { page } from '$app/stores';
+    import { toast } from '@zerodevx/svelte-toast';
     import { file } from '../../stores/file';
     import { hostname } from '../../stores/general';
     import { callAPI } from '../../utils/api';
@@ -68,10 +69,22 @@
         await callAPI({
             host: $hostname, endpoint: `/api/file/${ $page.params.id }`, method: 'PUT', body: body,
             callback: async (res) => {
-                if (res.ok) {
-                    $file = await res.json();
-                    return res.status;
-                }
+                if (!res.ok) return toast.push(`Error ${ res.statusText }`, {
+                    theme: {
+                        '--toastBackground': '#F56565',
+                        '--toastBarBackground': '#C53030'
+                    }
+                });
+
+                $file = await res.json();
+                toast.push('File updated', {
+                    theme: {
+                        '--toastBackground': '#48BB78',
+                        '--toastBarBackground': '#2F855A'
+                    }
+                });
+
+                return res.status;
             },
         });
     }

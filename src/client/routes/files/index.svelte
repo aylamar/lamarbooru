@@ -1,5 +1,6 @@
 <script lang="ts">
     import { page } from '$app/stores';
+    import { toast } from '@zerodevx/svelte-toast';
     import { onMount } from 'svelte';
     import Search from '../../lib/components/search/search.svelte';
     import Tags from '../../lib/components/search/tags.svelte';
@@ -36,10 +37,25 @@
         await callAPI({
             host: $hostname, endpoint: endpoint, method: 'GET',
             callback: async (res) => {
-                if (res.ok) {
-                    $params.isNavigating = false;
-                    $files = [...$files, ...await res.json()];
+                if (!res.ok) return toast.push(`Error ${ res.statusText }`, {
+                    theme: {
+                        '--toastBackground': '#F56565',
+                        '--toastBarBackground': '#C53030'
+                    }
+                });
+                let body = await res.json();
+                if (body.length == 0) {
+                    toast.push(`Displaying all matching files.`, {
+                        theme: {
+                            '--toastBackground': '#48BB78',
+                            '--toastBarBackground': '#2F855A'
+                        }
+                    });
+                    return $params.isNavigating = true;
                 }
+
+                $params.isNavigating = false;
+                $files = [...$files, ...body];
             },
         });
     }

@@ -1,5 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
+    import { toast } from '@zerodevx/svelte-toast';
     import { Tag } from '../../stores/file';
     import { hostname } from '../../stores/general';
     import { derivedParams, files, pageSize, params, tags } from '../../stores/search';
@@ -19,10 +20,16 @@
         await callAPI({
             host: $hostname, endpoint: endpoint, method: 'GET',
             callback: async (res) => {
-                if (res.ok) {
-                    $params.idx = $params.idx + $pageSize;
-                    $files = [...$files, ...await res.json()];
-                }
+                if (!res.ok) return toast.push(`Error ${ res.statusText }`, {
+                    theme: {
+                        '--toastBackground': '#F56565',
+                        '--toastBarBackground': '#C53030'
+                    }
+                });
+
+                $params.idx = $params.idx + $pageSize;
+                $files = [...$files, ...await res.json()];
+                return
             },
         });
         return { status: 200 };
@@ -36,6 +43,13 @@
         await callAPI({
             host: $hostname, endpoint: `/api/tag/search/${ param }`, method: 'GET',
             callback: async (res: Response) => {
+                if (!res.ok) return toast.push(`Error ${ res.statusText }`, {
+                    theme: {
+                        '--toastBackground': '#F56565',
+                        '--toastBarBackground': '#C53030'
+                    }
+                });
+
                 const parsedTags: Tag[] = await res.json();
                 tags.set(parsedTags.slice(0, 5));
             },

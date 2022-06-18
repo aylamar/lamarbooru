@@ -1,5 +1,6 @@
 <script lang="ts">
     import { page } from '$app/stores';
+    import { toast } from '@zerodevx/svelte-toast';
     import { file, fileSettings, fileUrl } from '../../stores/file';
     import { hostname } from '../../stores/general';
     import { callAPI } from '../../utils/api';
@@ -26,12 +27,25 @@
             endpoint: `/api/file/trash/${ $page.params.id }`,
             method: method,
             callback: async (res: Response) => {
-                if (res.ok) {
-                    $file.trash = !$file.trash;
+                if (!res.ok) {
                     updatingTrash = false;
-                } else {
-                    updatingTrash = false;
+                    return toast.push(`Error ${ res.statusText }`, {
+                        theme: {
+                            '--toastBackground': '#F56565',
+                            '--toastBarBackground': '#C53030'
+                        }
+                    });
                 }
+
+                $file.trash = !$file.trash;
+                updatingTrash = false;
+                // send toast message confirming trash status
+                return toast.push(`${ $file.trash ? 'Trashed' : 'Restored' } file `, {
+                    theme: {
+                        '--toastBackground': $file.trash ? '#F56565' : '#48BB78',
+                        '--toastBarBackground': $file.trash ? '#C53030' : '#2F855A',
+                    }
+                });
             },
         });
     }
