@@ -11,9 +11,9 @@
             params.set({
                 tagSearchParams: '',
                 // searchSpecificStatus: false,
-                includeInbox: !!(status && 'inbox'),
-                includeTrash: !!(status && 'trash'),
-                includeArchive: !!(status && 'archived'),
+                includeInbox: status === 'inbox',
+                includeTrash: status === 'trash',
+                includeArchive: status === 'archived',
                 isNavigating: true,
                 idx: 1,
             });
