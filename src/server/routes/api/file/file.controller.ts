@@ -5,6 +5,7 @@ import {
     searchFileHandler,
     trashFileHandler,
     updateFileHandler,
+    updateFileStatusHandler,
     uploadBooruFile,
     uploadFileHandler,
 } from './file.service.js';
@@ -19,6 +20,8 @@ router.post('/', upload.single('file'), uploadFileHandler);
 router.get('/:id', getFileHandler);
 // PUT /api/file/:id to update image with new tags/data
 router.put('/:id', updateFileHandler);
+// PUT /api/file/status/:id to update image status
+router.put('/status/:id', updateFileStatusHandler);
 // PUT /api/file/trash/:id sets a file's status as "trash" to be deleted in a few days
 router.put('/trash/:id', trashFileHandler);
 // DELETE /api/file/trash/:id sets a file's status as "trash" to be deleted in a few days

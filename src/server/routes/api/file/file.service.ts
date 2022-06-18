@@ -20,14 +20,14 @@ import {
     parseStatus,
     tagConnectQuery,
     tagDisconnectQuery,
-    updateFile,
+    updateFile, updateFileStatus,
     updateTrashStatus,
     urlConnectQuery,
     urlDisconnectQuery,
     writeFile,
 } from '../../../utils/file.util.js';
 import prisma from '../../../utils/prisma.util.js';
-import { booruSchema, fileSchema, idSchema, searchSchema } from './file.validation.js';
+import { booruSchema, fileSchema, idSchema, searchSchema, statusSchema } from './file.validation.js';
 
 export async function uploadFileHandler(req: Request, res: Response) {
     const start = new Date();
@@ -230,6 +230,31 @@ export async function trashFileHandler(req: Request, res: Response) {
 
     if (!trashStatus) return res.status(200).send({ 'message': 'File added to trash' });
     if (trashStatus) return res.status(200).send({ 'message': 'File removed from trash' });
+}
+
+export async function updateFileStatusHandler(req: Request, res: Response) {
+    let params: { id: number };
+    let query: { status: string };
+    try {
+        params = await idSchema.validateAsync(req.params);
+        query = await statusSchema.validateAsync(req.query);
+    } catch (err: any) {
+        return res.status(400).send(err.details);
+    }
+    const id = params.id;
+    const status = query.status;
+
+    const file = await getFileById(id);
+    if (!file) return res.status(404).send({ 'error': 'No files found' });
+
+    const parsedStatus = await parseStatus(status);
+
+    if (file.status.includes(parsedStatus)) return res.status(405).send({ 'error': `File is already marked as ${ status }` });
+    // update file status
+    const updatedFile = await updateFileStatus(id, parsedStatus);
+    if (!updatedFile) return res.status(500).send({ 'error': 'Error updating file' });
+
+    return res.status(200).send(updatedFile);
 }
 
 /*

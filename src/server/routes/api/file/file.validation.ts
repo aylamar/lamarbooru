@@ -19,3 +19,7 @@ export const searchSchema = Joi.object({
 export const booruSchema = Joi.object({
     url: Joi.string().uri().lowercase().required(),
 });
+
+export const statusSchema = Joi.object({
+    status: Joi.string().lowercase().valid('archived', 'inbox').required(),
+});
