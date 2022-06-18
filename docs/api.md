@@ -135,6 +135,30 @@ Unsuccessful response codes:
 * 404: No file found with that id.
 * 500: Database error while updating file.
 
+### PUT `/api/file/status/:id`
+
+_Sets a file to the specified status._
+
+Parameters:
+
+* `id`: (required) The ID of the file to move to the inbox.
+
+Arguments:
+
+* `status`: (required) Status to set file to (archived or inbox).
+
+```json title="Successful Reponse (200)"
+{
+    ... full file data ...
+}
+```
+
+Unsuccessful response codes:
+
+* 404: No file with matching id found.
+* 405: File found, but it is already marked input status.
+* 500: Database error while updating file.
+
 ### PUT `/api/file/trash/:id`
 
 _Removes a file from the trash and moves it to the inbox._
