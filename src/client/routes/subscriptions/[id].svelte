@@ -4,6 +4,7 @@
     import { hostname } from '../../lib/stores/general';
     import { subscription } from '../../lib/stores/subscription';
     import { callAPI } from '../../lib/utils/api';
+    import { formatDate } from '../../lib/utils/formatting.js';
 
     onMount(async () => {
         await callAPI({
@@ -15,26 +16,6 @@
             },
         });
     });
-
-
-    const formatDateTime = (date) => {
-        // return yyyy/mm/dd hh:mm
-        let d = new Date(date),
-            month = '' + (d.getMonth() + 1),
-            day = '' + d.getDate(),
-            year = d.getFullYear(),
-            hour = '' + d.getHours(),
-            min = '' + d.getMinutes();
-        if (month.length < 2)
-            month = '0' + month;
-        if (day.length < 2)
-            day = '0' + day;
-        if (hour.length < 2)
-            hour = '0' + hour;
-        if (min.length < 2)
-            min = '0' + min;
-        return [year, month, day].join('/') + ' ' + [hour, min].join(':');
-    };
 </script>
 <div class="not-prose relative bg-slate-50 rounded-xl overflow-hidden dark:bg-slate-800/25">
     {#if $subscription.runs}
@@ -77,9 +58,9 @@
                             <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{run.downloadedUrlCount}</td>
                             <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{run.skippedUrlCount}</td>
                             <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{run.failedUrlCount}</td>
-                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{formatDateTime(run.createDate)}</td>
-                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{formatDateTime(run.finishedAt)}</td>
-                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{formatDateTime(run.updateDate)}</td>
+                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{formatDate(run.createDate)}</td>
+                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{formatDate(run.finishedAt)}</td>
+                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{formatDate(run.updateDate)}</td>
                         </tr>
                     {/each}
                 </table>

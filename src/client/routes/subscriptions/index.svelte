@@ -26,25 +26,6 @@
             day = '0' + day;
         return [year, month, day].join('/');
     };
-
-    const formatDateTime = (date) => {
-        // return yyyy/mm/dd hh:mm
-        let d = new Date(date),
-            month = '' + (d.getMonth() + 1),
-            day = '' + d.getDate(),
-            year = d.getFullYear(),
-            hour = '' + d.getHours(),
-            min = '' + d.getMinutes();
-        if (month.length < 2)
-            month = '0' + month;
-        if (day.length < 2)
-            day = '0' + day;
-        if (hour.length < 2)
-            hour = '0' + hour;
-        if (min.length < 2)
-            min = '0' + min;
-        return [year, month, day].join('/') + ' ' + [hour, min].join(':');
-    };
 </script>
 <div class="not-prose relative bg-slate-50 rounded-xl overflow-hidden dark:bg-slate-800/25">
     {#if $subscriptions.length >= 1}
@@ -97,7 +78,7 @@
                             <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{sub.tagBlacklist.join(' ') || 'None'}</td>
                             <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{sub.status}</td>
                             <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{sub.interval}</td>
-                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{formatDateTime(sub.nextRun)}</td>
+                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{formatDate(sub.nextRun)}</td>
                             <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 text-slate-500 dark:text-slate-400">{sub._count.runs}</td>
                             <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{sub.limit}</td>
                             <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{formatDate(sub.createDate)}</td>
