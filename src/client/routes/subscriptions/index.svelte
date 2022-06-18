@@ -18,13 +18,11 @@
         });
     });
 </script>
-<div class="not-prose relative rounded-xl bg-slate-800/25">
+<div class="rounded-xl bg-slate-800/25">
     {#if $subscriptions.length >= 1}
-<!--        <div class="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-slate-700/25 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"></div>-->
         <div class="relative rounded-xl">
             <div class="shadow-sm my-8">
                 <table class="text-md w-full">
-<!--                    <caption class="text-xl font-bold text-center">Subscriptions</caption>-->
                     <thead class="border-b border-slate-700">
                     <tr>
                         <th class="p-3 w-16 font-medium text-slate-200 tracking-wide text-left">ID</th>
@@ -33,7 +31,7 @@
                         <th class="p-3 font-medium text-slate-200 tracking-wide text-right">Blacklisted Tags</th>
                         <th class="p-3 w-20 font-medium text-slate-200 tracking-wide text-right">Status</th>
                         <th class="p-3 w-20 font-medium text-slate-200 tracking-wide text-right">Interval</th>
-                        <th class="p-3 w-38 font-medium text-slate-200 tracking-wide text-right">Next Run</th>
+                        <th class="p-3 w-40 font-medium text-slate-200 tracking-wide text-right">Next Run</th>
                         <th class="p-3 w-28 font-medium text-slate-200 tracking-wide text-right">Total Runs</th>
                         <th class="p-3 w-32 font-medium text-slate-200 tracking-wide text-right">More Details</th>
                     </tr>
