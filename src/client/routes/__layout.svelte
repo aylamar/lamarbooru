@@ -13,7 +13,7 @@
     }
 
     const options: SvelteToastOptions = {
-        duration: 5000,
+        duration: 2000,
     }
 </script>
 
