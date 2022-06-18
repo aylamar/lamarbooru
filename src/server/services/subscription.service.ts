@@ -212,13 +212,7 @@ export class SubscriptionsService {
                 OR: [
                     {
                         AND: [
-                            { status: SubscriptionStatus.active },
-                            { nextRun: { lt: new Date() } },
-                        ],
-                    },
-                    {
-                        AND: [
-                            { status: SubscriptionStatus.finished },
+                            { status: SubscriptionStatus.waiting },
                             { nextRun: { lt: new Date() } },
                         ],
                     },
@@ -406,7 +400,7 @@ export class SubscriptionsService {
         await this.processSubscription(run, sub.limit, sub.tagBlacklist, prevUrl);
 
         await SubscriptionsService.updateRunStatus(run, SubscriptionStatus.finished, new Date());
-        await SubscriptionsService.updateSubscriptionStatus(sub, SubscriptionStatus.finished, nextRun);
+        await SubscriptionsService.updateSubscriptionStatus(sub, SubscriptionStatus.waiting, nextRun);
         logger.info(`finished subscription: ${ sub.tags.join(' ') } on ${ sub.site }`, { label: 'subscription' });
     }
 }

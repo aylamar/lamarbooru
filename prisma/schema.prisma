@@ -57,7 +57,7 @@ model Subscription {
   tags         String[]
   tagBlacklist String[]
   limit        Int                @default(200)
-  status       SubscriptionStatus @default(active)
+  status       SubscriptionStatus @default(waiting)
   interval     Interval           @default(daily)
   runs         SubscriptionRun[]
   nextRun      DateTime?          @default(now())
@@ -143,7 +143,7 @@ enum Interval {
 }
 
 enum SubscriptionStatus {
-  active
+  waiting
   running
   paused
   finished
