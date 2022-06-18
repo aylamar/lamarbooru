@@ -5,7 +5,7 @@
     import Tags from '../../lib/components/search/tags.svelte';
     import Thumbnail from '../../lib/components/search/thumbnail.svelte';
     import { hostname } from '../../lib/stores/general';
-    import { derivedParams, derivedTags, files, params } from '../../lib/stores/search';
+    import { derivedParams, derivedTags, files, pageSize, params } from '../../lib/stores/search';
     import { callAPI } from '../../lib/utils/api';
 
     onMount(async () => {
@@ -19,10 +19,11 @@
         $files = [];
         params.set({
             tagSearchParams: param,
-            searchSpecificStatus: status == 'archive+inbox',
+            // searchSpecificStatus: status == 'archive+inbox',
             includeArchive: parsedStatus && parsedStatus.includes('archive'),
             includeInbox: parsedStatus && parsedStatus.includes('inbox'),
             includeTrash: parsedStatus && parsedStatus.includes('trash'),
+            isNavigating: true,
             idx: 1,
         });
         void await fetchFiles();
@@ -30,17 +31,17 @@
 
     async function fetchFiles() {
         let endpoint = `/api/file/search/${ $params.idx }?${ $derivedParams }`;
-        $params.idx = $params.idx + 32;
+        $params.idx = $params.idx + $pageSize;
 
         await callAPI({
             host: $hostname, endpoint: endpoint, method: 'GET',
             callback: async (res) => {
                 if (res.ok) {
+                    $params.isNavigating = false;
                     $files = [...$files, ...await res.json()];
                 }
             },
         });
-
     }
 
     let intersectionObserver;
@@ -50,7 +51,6 @@
         intersectionObserver = new IntersectionObserver(
             (entries) => {
                 entries.forEach(entry => {
-                    // console.log(entry.isIntersecting);
                     const eventName = entry.isIntersecting ? 'enterViewport' : 'exitViewport';
                     entry.target.dispatchEvent(new CustomEvent(eventName));
                 });
@@ -85,7 +85,9 @@
         {#each $files as file}
             <Thumbnail filename={file.filename} id={file.id} status={file.status}/>
         {/each}
-        <div on:enterViewport={() => fetchFiles()} use:viewport></div>
+        {#if $params.isNavigating === false}
+            <div on:enterViewport={() => fetchFiles()} use:viewport></div>
+        {/if}
     </div>
 </div>
 

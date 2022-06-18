@@ -3,7 +3,7 @@
     import { fade } from 'svelte/transition';
     import type { Tag } from '../../stores/file';
     import { hostname } from '../../stores/general';
-    import { files, params, tags } from '../../stores/search';
+    import { files, pageSize, params, tags } from '../../stores/search';
     import { callAPI } from '../../utils/api';
 
     export let displayTags: Tag[] = [];
@@ -45,7 +45,7 @@
             host: $hostname, endpoint: endpoint, method: 'GET',
             callback: async (res) => {
                 if (res.ok) {
-                    $params.idx = $params.idx + 32;
+                    $params.idx = $params.idx + $pageSize;
                     $files = [...$files, ...await res.json()];
                 }
             },
@@ -74,7 +74,8 @@
         <ul class="xs">
             {#each processedTags as tag}
                 <li transition:fade>
-                    <a on:click={handleTagClick(tag.tag)} class="{tag.color} hover:cursor-pointer">{tag.tag.replace(/_/g, ' ')}</a> <span
+                    <a on:click={handleTagClick(tag.tag)}
+                       class="{tag.color} hover:cursor-pointer">{tag.tag.replace(/_/g, ' ')}</a> <span
                         class="text-slate-500">{tag.count}</span>
                 </li>
             {/each}

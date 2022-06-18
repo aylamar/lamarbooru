@@ -193,7 +193,7 @@ Arguments:
 
 ### GET `/api/file/search/:page`
 
-_Get a page of 32 files, optionally filtered by tag_
+_Get a page of 64 files, optionally filtered by tag_
 
 Parameters:
 

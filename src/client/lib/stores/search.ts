@@ -1,25 +1,27 @@
-import { derived, writable } from 'svelte/store';
+import { derived, readable, writable } from 'svelte/store';
 import type { File, Tag } from './file';
 
 type Params = {
     tagSearchParams: string,
-    searchSpecificStatus: boolean,
+    // searchSpecificStatus: boolean,
     includeArchive: boolean,
     includeInbox: boolean,
     includeTrash: boolean,
+    isNavigating: boolean,
     idx: number,
 }
 
-
 export const params = writable<Params>({
     tagSearchParams: '',
-    searchSpecificStatus: false,
+    // searchSpecificStatus: false,
     includeArchive: true,
     includeInbox: true,
     includeTrash: false,
+    isNavigating: false,
     idx: 1,
 });
 
+export const pageSize = readable(64);
 export const searchSpecificStatus = writable<boolean>(false);
 
 export type tagData = {
@@ -34,7 +36,7 @@ export const derivedParams = derived(params, (params) => {
     if (params.tagSearchParams != null && params.tagSearchParams != '') urlString += `&tags=${ params.tagSearchParams.trim().replace(/\s/g, '+') }`;
 
     // if searchSpecificStatus is false, do not bother
-    if (params.searchSpecificStatus) {
+    if (params.includeInbox || params.includeArchive || params.includeTrash) {
         let statusString = '';
         if (params.includeArchive) statusString += 'archived+';
         if (params.includeInbox) statusString += 'inbox+';

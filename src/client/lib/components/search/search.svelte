@@ -2,7 +2,7 @@
     import { goto } from '$app/navigation';
     import { Tag } from '../../stores/file';
     import { hostname } from '../../stores/general';
-    import { derivedParams, files, params, tags } from '../../stores/search';
+    import { derivedParams, files, pageSize, params, tags } from '../../stores/search';
     import { callAPI } from '../../utils/api';
 
     export let handleOnSubmit = async (e) => {
@@ -20,7 +20,7 @@
             host: $hostname, endpoint: endpoint, method: 'GET',
             callback: async (res) => {
                 if (res.ok) {
-                    $params.idx = $params.idx + 32;
+                    $params.idx = $params.idx + $pageSize;
                     $files = [...$files, ...await res.json()];
                 }
             },
@@ -72,27 +72,27 @@
         </ul>
     {/if}
 
-    <div class="">
-        <input bind:checked={$params.searchSpecificStatus} class="rounded-full border-2 "
-               type="checkbox"/>
-        <span class="w-text-slate-400">Search for specific status</span>
-    </div>
+    <!--    <div class="">-->
+    <!--        <input bind:checked={$params.searchSpecificStatus} class="rounded-full border-2 "-->
+    <!--               type="checkbox"/>-->
+    <!--        <span class="w-text-slate-400">Search for specific status</span>-->
+    <!--    </div>-->
 
-    {#if $params.searchSpecificStatus === true}
-        <div class="">
-            <input type="checkbox" bind:checked={$params.includeArchive}
-                   class="rounded-full border-2 "/>
-            <span class="w-text-slate-400">Archive</span>
-        </div>
-        <div class="">
-            <input type="checkbox" bind:checked={$params.includeInbox}
-                   class="rounded-full border-2 "/>
-            <span class="w-text-slate-400">Inbox</span>
-        </div>
-        <div class="">
-            <input type="checkbox" bind:checked={$params.includeTrash}
-                   class="rounded-full border-2 "/>
-            <span class="w-text-slate-400">Trash</span>
-        </div>
-    {/if}
+    <!--    {#if $params.searchSpecificStatus === 'tmp'}-->
+    <!--        <div class="">-->
+    <!--            <input type="checkbox" bind:checked={$params.includeArchive}-->
+    <!--                   class="rounded-full border-2 "/>-->
+    <!--            <span class="w-text-slate-400">Archive</span>-->
+    <!--        </div>-->
+    <!--        <div class="">-->
+    <!--            <input type="checkbox" bind:checked={$params.includeInbox}-->
+    <!--                   class="rounded-full border-2 "/>-->
+    <!--            <span class="w-text-slate-400">Inbox</span>-->
+    <!--        </div>-->
+    <!--        <div class="">-->
+    <!--            <input type="checkbox" bind:checked={$params.includeTrash}-->
+    <!--                   class="rounded-full border-2 "/>-->
+    <!--            <span class="w-text-slate-400">Trash</span>-->
+    <!--        </div>-->
+    <!--    {/if}-->
 </div>

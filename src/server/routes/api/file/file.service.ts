@@ -270,7 +270,7 @@ async function getFileById(id: number) {
 }
 
 /*
-    Search for a page of 32 images with optional tags
+    Search for a page of 64 images with optional tags
     @param page - the page to search
     @param tags - the tags to search for
     @returns the page of images if found, otherwise empty array
@@ -305,7 +305,7 @@ async function searchImages(idx: number, inclStatus: FileStatus[], tags?: string
                     },
                 },
             },
-            skip: idx - 1, take: 32,
+            skip: idx - 1, take: 64,
         });
     } else {
         return await prisma.file.findMany({
@@ -326,7 +326,7 @@ async function searchImages(idx: number, inclStatus: FileStatus[], tags?: string
                     },
                 },
             },
-            skip: idx - 1, take: 32,
+            skip: idx - 1, take: 64,
         });
     }
 }
