@@ -1,5 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
+    import { toast } from '@zerodevx/svelte-toast';
     import { file } from '../../lib/stores/file';
     import { hostname } from '../../lib/stores/general';
     import { callAPI } from '../../lib/utils/api';
@@ -24,18 +25,37 @@
     }
 
     async function handleBooru() {
+        console.log('handleBooru', booruUrl);
         const body = JSON.stringify({ url: booruUrl });
-        await callAPI({host: $hostname, endpoint: '/file/booru', method: 'POST', body: body,
+        await callAPI({host: $hostname, endpoint: '/api/file/booru', method: 'POST', body: body,
             callback: async (res: Response) => {
-                if (res.status === 200) {
-                    const data = await res.json();
-                    if (data.success) {
-                        file.set(data.file);
-                        goto(`/file/${ data.file.id }`);
-                    } else {
-                        alert(data.message);
-                    }
-                }
+                console.log(res.ok)
+                if (!res.ok) return toast.push(`Error ${ res.statusText }`, {
+                    theme: {
+                        '--toastBackground': '#F56565',
+                        '--toastBarBackground': '#C53030',
+                    },
+                });
+
+                let body = await res.json();
+                file.set(body);
+
+                if (res.status === 200) toast.push('File already exists.', {
+                    theme: {
+                        '--toastBackground': '#48BB78',
+                        '--toastBarBackground': '#2F855A',
+                    },
+                });
+
+                if (res.status === 201) toast.push('File uploaded successfully.', {
+                    theme: {
+                        '--toastBackground': '#48BB78',
+                        '--toastBarBackground': '#2F855A',
+                    },
+                });
+
+                return goto(`/files/${ body.file.id }`);
+
             },
         });
     }

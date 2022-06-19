@@ -199,6 +199,8 @@ export async function uploadBooruFile(req: Request, res: Response) {
 
     const downloaderService = new DownloaderService();
     const file = await downloaderService.downloadFileFromService(data.url);
+    if (!file) return res.status(500).send({ 'error': 'Error downloading file' });
+    if (file.status === 'exists') return res.status(200).send(file);
 
     return res.status(201).send(file);
 }
