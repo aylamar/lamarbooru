@@ -16,7 +16,7 @@ export class SubscriptionsService {
 
         cron.schedule('*/15 * * * *', () => {
             void this.runWaitingSubscriptions();
-        })
+        });
     }
 
     /*
@@ -279,7 +279,7 @@ export class SubscriptionsService {
         }
 
         this.isRunning = false;
-        return
+        return;
     }
 
     /*
@@ -370,6 +370,7 @@ export class SubscriptionsService {
                         run = await SubscriptionsService.updateRunCounts(run, url, 'skipped');
                         prevImg = 'skipped';
                     } else {
+                        logger.error(`${ error }`, { label: 'subscription' });
                         run = await SubscriptionsService.updateRunCounts(run, url, 'failed');
                         prevImg = 'failed';
                     }
