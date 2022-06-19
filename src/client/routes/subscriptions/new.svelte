@@ -54,7 +54,10 @@
 
 
 <form class="grid place-items-center">
-    <div class="grid grid-cols-2 gap-6 grid-cols-2 min-w-fit w-1/2 px-4 py-6 rounded-lg bg-slate-800/25">
+    <div class="grid grid-cols-2 gap-6 grid-cols-2 min-w-fit w-1/2 p-4 rounded-lg bg-slate-800/25">
+        <div class="col-span-2 font-medium">
+            <p>Add New Subscription</p>
+        </div>
         <div class="relative border-2 border-slate-800 focus-within:border-blue-900 rounded-lg">
             <input bind:value={tags}
                    class="w-text-slate-400 p-2 rounded-md shadow-sm block w-full appearance-none focus:outline-none bg-transparent"
