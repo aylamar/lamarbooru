@@ -5,6 +5,7 @@
     import { subscription } from '../../lib/stores/subscription';
     import { callAPI } from '../../lib/utils/api';
     import { formatDate } from '../../lib/utils/formatting.js';
+    import { getStatusStyle, getStyle } from '../../lib/utils/subscription.js';
 
     onMount(async () => {
         await callAPI({
@@ -17,50 +18,40 @@
         });
     });
 </script>
-<div class="not-prose relative bg-slate-50 rounded-xl overflow-hidden dark:bg-slate-800/25">
+
+<div class="rounded-xl bg-slate-800/25">
     {#if $subscription.runs}
-        <div class="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-slate-700/25 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"></div>
-        <div class="relative rounded-xl overflow-auto">
-            <div class="shadow-sm overflow-hidden my-8">
-                <table class="border-collapse w-full text-md">
+        <div class="relative rounded-xl">
+            <div class="shadow-sm mb-8">
+                <table class="text-md w-full">
                     <thead>
                     <tr>
-                        <th class="border-b dark:border-slate-600 font-medium p-3 pl-8 pt-0 pb-3 dark:text-slate-200 text-left">
-                            ID
-                        </th>
-                        <th class="border-b dark:border-slate-600 font-medium p-3 pl-8 pt-0 pb-3 dark:text-slate-200 text-left">
-                            Status
-                        </th>
-                        <th class="border-b dark:border-slate-600 font-medium p-3 pl-8 pt-0 pb-3 dark:text-slate-200 text-left">
-                            Downloaded Urls
-                        </th>
-                        <th class="border-b dark:border-slate-600 font-medium p-3 pl-8 pt-0 pb-3 dark:text-slate-200 text-left">
-                            Skipped Urls
-                        </th>
-                        <th class="border-b dark:border-slate-600 font-medium p-3 pl-8 pt-0 pb-3 dark:text-slate-200 text-left">
-                            Failed Urls
-                        </th>
-                        <th class="border-b dark:border-slate-600 font-medium p-3 pl-8 pt-0 pb-3 dark:text-slate-200 text-left">
-                            Start Date
-                        </th>
-                        <th class="border-b dark:border-slate-600 font-medium p-3 pl-8 pt-0 pb-3 dark:text-slate-200 text-left">
-                            Finish Date
-                        </th>
-                        <th class="border-b dark:border-slate-600 font-medium p-3 pl-8 pt-0 pb-3 dark:text-slate-200 text-left">
-                            Update Date
-                        </th>
+                        <th class="p-3 w-16 font-medium text-slate-200 tracking-wide text-left">ID</th>
+                        <th class="p-3 w-20 font-medium text-slate-200 tracking-wide text-left">Status</th>
+                        <th class="p-3 font-medium text-slate-200 tracking-wide text-left">Downloaded Urls</th>
+                        <th class="p-3 font-medium text-slate-200 tracking-wide text-left">Skipped Urls</th>
+                        <th class="p-3 font-medium text-slate-200 tracking-wide text-left">Failed Urls</th>
+                        <th class="p-3 font-medium text-slate-200 tracking-wide text-right">Start Date</th>
+                        <th class="p-3 font-medium text-slate-200 tracking-wide text-right">Finish Date</th>
+                        <th class="p-3 font-medium text-slate-200 tracking-wide text-right">Update Date</th>
+                        <th class="p-3 font-medium text-slate-200 tracking-wide text-right">More Details</th>
                     </tr>
                     </thead>
-                    {#each $subscription.runs as run}
-                        <tr>
-                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{run.id}</td>
-                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{run.status}</td>
-                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{run.downloadedUrlCount}</td>
-                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{run.skippedUrlCount}</td>
-                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{run.failedUrlCount}</td>
-                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{formatDate(run.createDate)}</td>
-                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{formatDate(run.finishedAt)}</td>
-                            <td class="border-b border-slate-100 dark:border-slate-700 p-3 pl-8 dark:text-slate-400">{formatDate(run.updateDate)}</td>
+                    {#each $subscription.runs as run, i}
+                        <tr class={getStyle(i)}>
+                            <td class="p-3 text-slate-400">{run.id}</td>
+                            <td class="p-3 text-slate-400">
+                                <span class={getStatusStyle(run.status)}>{run.status}</span>
+                            </td>
+                            <td class="p-3 text-slate-400">{run.downloadedUrlCount}</td>
+                            <td class="p-3 text-slate-400">{run.skippedUrlCount}</td>
+                            <td class="p-3 text-slate-400">{run.failedUrlCount}</td>
+                            <td class="p-3 text-slate-400 text-right">{formatDate(run.createDate)}</td>
+                            <td class="p-3 text-slate-400 text-right">{formatDate(run.finishedAt)}</td>
+                            <td class="p-3 text-slate-400 text-right">{formatDate(run.updateDate)}</td>
+                            <td class="p-3 text-slate-400 text-right">
+                                <a href={`/subscriptions/log/${run.id}`}>Log Details</a>
+                            </td>
                         </tr>
                     {/each}
                 </table>
