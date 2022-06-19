@@ -214,6 +214,10 @@ Arguments:
 }
 ```
 
+Unsuccessful response codes:
+
+* 400: Invalid site url or invalid parameters.
+* 500: Database error while updating file.
 
 ### GET `/api/file/search/:page`
 
@@ -419,10 +423,41 @@ Parameters:
 }
 ```
 
+### PUT `/api/subscription/:id`
+
+_Update a subscription._
+
+Parameters:
+
+* `id`: (required) The numerical ID of the file to update.
+
+Arguments:
+
+* `status`: (required) The status to upgrade the subscription to (must be waiting or paused).
+
+```json title="Successful Reponse (200)"
+{
+    "id": 1,
+    "createDate": "2022-06-05T02:08:40.361Z",
+    "updateDate": "2022-06-05T02:20:06.852Z",
+    "site": "danbooru",
+    "tags": [
+        "mizuhara_chizuru"
+    ],
+    "tagBlacklist": [
+        "comic"
+    ],
+    "limit": 200,
+    "status": "finished",
+    "interval": "daily",
+    "nextRun": "2022-06-06T02:17:44.655Z",
+}
+```
+
 Unsuccessful response codes:
 
-* 400: Missing required fields or invalid field data.
-* 404: No run found with matching id.
+* 404: No subscription found with matching id.
+* 500: Database error while updating subscription.
 
 ### GET `/api/subscription/logs/:id`
 
@@ -455,7 +490,10 @@ Parameters:
             "url": "https://danbooru.donmai.us/posts/000000",
             "status": "downloaded",
             "createDate": "2022-06-05T02:12:06.132Z",
-            "updateDate": "2022-06-05T02:12:06.133Z"
+            "updateDate": "2022-06-05T02:12:06.133Z",
+            "file": {
+                ... associated file object if any ...
+            }
         },
         .... etc ....
     ]
