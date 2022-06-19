@@ -59,7 +59,7 @@
         <div class="relative rounded-xl">
             <div class="shadow-sm mb-8">
                 <table class="text-md w-full">
-                    <thead class="border-b border-slate-700">
+                    <thead>
                     <tr>
                         <th class="p-3 w-16 font-medium text-slate-200 tracking-wide text-left">ID</th>
                         <th class="p-3 w-24 font-medium text-slate-200 tracking-wide text-left">Site</th>
@@ -85,7 +85,7 @@
                             <td class="p-3 text-slate-400 text-right">{formatDate(sub.nextRun)}</td>
                             <td class="p-3 text-slate-400 text-right">{sub._count.runs}</td>
                             <td class="p-3 text-slate-400 text-right">
-                                <a href={`/subscriptions/${sub.id}`}>More Details</a>
+                                <a href={`/subscriptions/${sub.id}`}>Previous Runs</a>
                             </td>
                         </tr>
                     {/each}
