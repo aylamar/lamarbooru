@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { toast } from '@zerodevx/svelte-toast';
     import { onMount } from 'svelte';
     import { hostname } from '../../lib/stores/general';
     import { subscriptions } from '../../lib/stores/subscriptions';
@@ -19,6 +20,38 @@
             },
         });
     });
+
+    async function updateSubscriptionStatus(id: number, currStatus: string) {
+        let newStatus = 'waiting'
+        // if current status is currStatus is waiting or running, set to pause
+        if (currStatus === 'waiting' || currStatus === 'running') newStatus = 'paused';
+
+        await callAPI({
+            host: $hostname, endpoint: `/api/subscription/${id}?status=${newStatus}` , method: 'PUT',
+            callback: async (res) => {
+                if (!res.ok) return toast.push(`Error ${ res.statusText }`, {
+                    theme: {
+                        '--toastBackground': '#F56565',
+                        '--toastBarBackground': '#C53030',
+                    },
+                });
+
+                // update subscription status in store
+                subscriptions.update((subs) => {
+                    const sub = subs.find((s) => s.id === id);
+                    if (sub) sub.status = newStatus;
+                    return subs;
+                });
+
+                toast.push(`Subscription ${ id } updated to ${ newStatus }`, {
+                    theme: {
+                        '--toastBackground': '#48BB78',
+                        '--toastBarBackground': '#2F855A',
+                    },
+                });
+            },
+        });
+    }
 </script>
 
 <div class="rounded-xl bg-slate-800/25">
@@ -46,7 +79,7 @@
                             <td class="p-3 text-slate-400">{sub.tags}</td>
                             <td class="p-3 text-slate-400 text-right">{sub.tagBlacklist.join(' ') || 'none'}</td>
                             <td class="p-3 text-slate-400 text-right">
-                                <span class={getStatusStyle(sub.status)}>{sub.status}</span>
+                                <span on:click={updateSubscriptionStatus(sub.id, sub.status)} class={getStatusStyle(sub.status)}>{sub.status}</span>
                             </td>
                             <td class="p-3 text-slate-400 text-right">{sub.interval}</td>
                             <td class="p-3 text-slate-400 text-right">{formatDate(sub.nextRun)}</td>
