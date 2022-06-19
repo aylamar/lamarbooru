@@ -81,7 +81,7 @@ model SubscriptionRun {
   skippedUrlCount    Int                @default(0)
   failedUrlCount     Int                @default(0)
   finished           Boolean            @default(false)
-  finishedAt         DateTime?
+  finishDate         DateTime?
 
   @@map("runs")
 }
