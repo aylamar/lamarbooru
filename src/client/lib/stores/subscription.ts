@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 
-export type Run = {
+export type SubLogTrimmed = {
     id: number,
     createDate: Date,
     updateDate: Date,
@@ -26,7 +26,7 @@ export type Subscription = {
     status: string,
     interval: string,
     nextRun: Date,
-    runs: Run[],
+    runs: SubLogTrimmed[],
     _count: {
         runs: number
     }
