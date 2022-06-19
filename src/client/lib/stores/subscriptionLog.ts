@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
 
 export type LogFile = {
     id: number,
@@ -40,4 +40,16 @@ export type SubscriptionLog = {
     log: LogEntry[]
 }
 
+export const logFile = writable<LogFile>({} as LogFile);
+
 export const subscriptionLog = writable({} as SubscriptionLog);
+
+export const logDerivedFiles = derived(subscriptionLog, (subLog) => {
+    let files = [];
+    for (const i in subLog.log) {
+        if (subLog.log[i].file) {
+            files.push(subLog.log[i].file);
+        }
+    }
+    return files;
+});
