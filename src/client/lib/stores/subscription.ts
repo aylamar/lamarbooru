@@ -12,7 +12,7 @@ export type SubLogTrimmed = {
     skippedUrlCount: number,
     failedUrlCount: number,
     finished: boolean,
-    finishedAt: Date,
+    finishDate: Date,
 }
 
 export type Subscription = {

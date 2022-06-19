@@ -106,7 +106,7 @@ export class SubscriptionsService {
             data = {
                 status: status,
                 finished: true,
-                finishedAt: finishTime,
+                finishDate: finishTime,
             };
         }
 
