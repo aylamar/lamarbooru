@@ -6,22 +6,25 @@
     import { formatDate} from '../../lib/utils/formatting.js';
     import { getStyle } from '../../lib/utils/subscription';
     import { getStatusStyle } from "../../lib/utils/subscription.js";
+    $: loading = true;
 
     onMount(async () => {
         await callAPI({
             host: $hostname, endpoint: '/api/subscription', method: 'GET',
             callback: async (res) => {
                 if (res.ok) {
+                    loading = false;
                     subscriptions.set(await res.json());
                 }
             },
         });
     });
 </script>
+
 <div class="rounded-xl bg-slate-800/25">
     {#if $subscriptions.length >= 1}
         <div class="relative rounded-xl">
-            <div class="shadow-sm my-8">
+            <div class="shadow-sm mb-8">
                 <table class="text-md w-full">
                     <thead class="border-b border-slate-700">
                     <tr>
@@ -56,7 +59,13 @@
                 </table>
             </div>
         </div>
+    {:else if $subscriptions.length === 0 && loading === false}
+        <div class="p-8">
+            <p class="text-center text-slate-200">No subscriptions found.</p>
+        </div>
     {:else}
-        <p>Loading...</p>
+        <div class="p-8">
+            <p class="text-center text-slate-200">Loading...</p>
+        </div>
     {/if}
 </div>
