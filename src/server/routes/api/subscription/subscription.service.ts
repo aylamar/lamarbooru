@@ -110,7 +110,14 @@ export async function getLogsByIdHandler(req: Request, res: Response) {
             id: data.id,
         },
         include: {
-            log: true,
+            log: {
+                include: {
+                    file: { include: { tags: true } },
+                },
+                orderBy: {
+                    createDate: 'desc'
+                }
+            },
         },
     });
 
