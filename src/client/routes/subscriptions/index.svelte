@@ -84,8 +84,8 @@
                             <td class="p-3 text-slate-400 text-right">{sub.interval}</td>
                             <td class="p-3 text-slate-400 text-right">{formatDate(sub.nextRun)}</td>
                             <td class="p-3 text-slate-400 text-right">{sub._count.runs}</td>
-                            <td class="p-3 text-slate-400 text-right">
-                                <a href={`/subscriptions/${sub.id}`}>Previous Runs</a>
+                            <td class="p-3 text-right">
+                                <a class="text-sky-400" href={`/subscriptions/${sub.id}`}>Previous Runs</a>
                             </td>
                         </tr>
                     {/each}

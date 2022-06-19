@@ -49,8 +49,8 @@
                             <td class="p-3 text-slate-400 text-right">{formatDate(run.createDate)}</td>
                             <td class="p-3 text-slate-400 text-right">{formatDate(run.finishedAt)}</td>
                             <td class="p-3 text-slate-400 text-right">{formatDate(run.updateDate)}</td>
-                            <td class="p-3 text-slate-400 text-right">
-                                <a href={`/subscriptions/logs/${run.id}`}>Log Details</a>
+                            <td class="p-3 text-right">
+                                <a class="text-sky-400" href={`/subscriptions/logs/${run.id}`}>Log Details</a>
                             </td>
                         </tr>
                     {/each}
