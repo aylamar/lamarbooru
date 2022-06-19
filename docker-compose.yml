@@ -23,7 +23,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=6969
-      - DATABASE_URL=postgresql://postgres:postgres@lamarbooru-postgres:5432/postgres?schema=postgres
+      - DATABASE_URL=postgresql://postgres:postgres@lamarbooru-postgres:5432/postgres?schema=lamarbooru
       - FILES_DIRECTORY=/files
       - THUMBNAILS_DIRECTORY=/thumbnails
       - DELETE_MISPLACED_FILES=false
