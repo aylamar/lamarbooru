@@ -8,8 +8,12 @@ export const newSubscriptionSchema = Joi.object({
     limit: Joi.number().integer().min(1).max(1000000).optional(),
 });
 
-export const subscriptionIdSchema = Joi.object({
+export const subIdSchema = Joi.object({
     id: Joi.number().min(1).required(),
+});
+
+export const subStatusSchema = Joi.object({
+    status: Joi.string().lowercase().valid('waiting', 'paused').required(),
 });
 
 export const logIdSchema = Joi.object({
