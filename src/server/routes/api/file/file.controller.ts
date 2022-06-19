@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import multer, { memoryStorage } from 'multer';
 import {
+    bulkStatusUpdateHandler,
     getFileHandler,
     searchFileHandler,
     trashFileHandler,
@@ -30,5 +31,7 @@ router.delete('/trash/:id', trashFileHandler);
 router.get('/search/:id/', searchFileHandler);
 // PUT /api/file/booru to upload a file from booru
 router.post('/booru', uploadBooruFile);
+// PUT /api/file/bulk/status to update multiple files at once
+router.put('/bulk/status', bulkStatusUpdateHandler);
 
 export default router;

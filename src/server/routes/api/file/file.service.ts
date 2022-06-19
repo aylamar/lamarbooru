@@ -1,5 +1,6 @@
 import { FileStatus, Prisma, Rating, Site } from '@prisma/client';
 import { Request, Response } from 'express';
+import Joi from 'joi';
 import { DownloaderService } from '../../../downloaders/downloader.service.js';
 import { logger } from '../../../server.js';
 import {
@@ -27,7 +28,7 @@ import {
     writeFile,
 } from '../../../utils/file.util.js';
 import prisma from '../../../utils/prisma.util.js';
-import { booruSchema, fileSchema, idSchema, searchSchema, statusSchema } from './file.validation.js';
+import { booruSchema, bulkStatusSchema, fileSchema, idSchema, searchSchema, statusSchema } from './file.validation.js';
 
 export async function uploadFileHandler(req: Request, res: Response) {
     const start = new Date();
@@ -257,6 +258,40 @@ export async function updateFileStatusHandler(req: Request, res: Response) {
     if (!updatedFile) return res.status(500).send({ 'error': 'Error updating file' });
 
     return res.status(200).send(updatedFile);
+}
+
+export async function bulkStatusUpdateHandler(req: Request, res: Response) {
+    let query: { archived: number[], trash: number[] };
+    try {
+        query = await bulkStatusSchema.validateAsync(req.query);
+    } catch (err: any) {
+        if (err instanceof Joi.ValidationError) return res.status(400).send(err.details);
+        logger.error(err, { label: 'file-service' });
+        return res.status(500).send(err.details);
+    }
+
+    let archivedCount = 0
+    let trashCount = 0
+
+    // if archived array is not empty, update archived status
+    if (query.archived) {
+        const archived = await prisma.file.updateMany({
+            where: { id: { in: query.archived } },
+            data: { status: { set: FileStatus.archived } }
+        })
+        archivedCount = archived.count
+    }
+
+    // if trash array is not empty, update trash status
+    if (query.trash) {
+        const trash = await prisma.file.updateMany({
+            where: { id: { in: query.trash } },
+            data: { trash: false }
+        })
+        trashCount = trash.count
+    }
+
+    return res.status(200).send({ 'archived': archivedCount, 'trash': trashCount });
 }
 
 /*
