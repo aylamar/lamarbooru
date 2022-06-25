@@ -180,10 +180,10 @@ export async function generateFileName(extension: string) {
     Generates a thumbnail in the thumbnail directory using sourceFile
     @param sourceFile: Path to source file to generate thumbnail of
  */
-async function generateThumbnail(sourceFile: string) {
+export async function generateThumbnail(sourceFile: string) {
     await sharp(`${ fileBasePath }/${ sourceFile }`)
-        .resize(226, 226, {
-            fit: 'inside', withoutEnlargement: true,
+        .resize(208, 208, {
+            fit: 'cover', withoutEnlargement: true,
         })
         .toFile(`${ thumbnailBasePath }/${ sourceFile }`);
 }
