@@ -1,16 +1,14 @@
-<script lang="ts" context="module">
+<script context="module" lang="ts">
     import { toast } from '@zerodevx/svelte-toast';
     import { get } from 'svelte/store';
     import { derivedParams, files, pageSize, params } from '../../lib/stores/search';
-    import { callAPI } from '../../lib/utils/api';
 
-    export async function load({ url }) {
+    export async function load({ fetch, url }) {
         const urlObj = new URL(url);
 
         let param = urlObj.searchParams.get('tags');
         const status = urlObj.searchParams.get('status');
         const trash = urlObj.searchParams.get('trash');
-        const host = urlObj.host;
 
         // split status into array
         let parsedStatus: string[];
@@ -19,7 +17,6 @@
         if (!param) param = '';
         params.set({
             tagSearchParams: param,
-            // searchSpecificStatus: status == 'archive+inbox',
             includeArchive: parsedStatus && parsedStatus.includes('archived'),
             includeInbox: parsedStatus && parsedStatus.includes('inbox'),
             includeTrash: trash == 'true',
@@ -28,23 +25,23 @@
         });
 
         let endpoint = `/api/file/search/1?${ get(derivedParams) }`;
-        return await callAPI({
-            host: host, endpoint: endpoint, method: 'GET',
-            callback: async (res) => {
-                if (!res.ok) return toast.push(`Error ${ res.statusText }`, {
-                    theme: {
-                        '--toastBackground': '#F56565',
-                        '--toastBarBackground': '#C53030'
-                    }
-                });
-                let body = await res.json();
-                files.set(body);
-                return {
-                    files: body,
-                    params: get(params)
-                };
-            },
-        });
+        endpoint = (import.meta.env.VITE_BASE_URL || '') + endpoint;
+        try {
+            const res = await fetch(endpoint);
+            if (!res.ok) new Error(`${ res.status } ${ res.statusText }`);
+            let body = await res.json();
+            files.set(body);
+            return {
+                files: body,
+                params: get(params),
+            };
+        } catch (e) {
+            if (e.name === 'TypeError') console.log(e)
+            return {
+                files: [],
+                params: get(params),
+            };
+        }
     }
 
 
@@ -56,6 +53,7 @@
     import Thumbnail from '../../lib/components/search/thumbnail.svelte';
     import { hostname } from '../../lib/stores/general';
     import { derivedTags } from '../../lib/stores/search';
+    import { callAPI } from '../../lib/utils/api';
 
     async function fetchFiles() {
         let endpoint = `/api/file/search/${ $params.idx }?${ $derivedParams }`;
@@ -67,16 +65,16 @@
                 if (!res.ok) return toast.push(`Error ${ res.statusText }`, {
                     theme: {
                         '--toastBackground': '#F56565',
-                        '--toastBarBackground': '#C53030'
-                    }
+                        '--toastBarBackground': '#C53030',
+                    },
                 });
                 let body = await res.json();
                 if (body.length == 0) {
                     toast.push(`Displaying all matching files.`, {
                         theme: {
                             '--toastBackground': '#48BB78',
-                            '--toastBarBackground': '#2F855A'
-                        }
+                            '--toastBarBackground': '#2F855A',
+                        },
                     });
                     return $params.isNavigating = true;
                 }
