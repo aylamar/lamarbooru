@@ -1,14 +1,12 @@
 <script context="module" lang="ts">
-    import { browser } from '$app/env';
     import type { SvelteToastOptions } from '@zerodevx/svelte-toast';
     import { SvelteToast } from '@zerodevx/svelte-toast';
     import { currUrl, hostname } from '../lib/stores/general';
 
     export async function load({ url }) {
-        if (browser) {
-            hostname.set(window.location.origin);
-        }
-
+        // convert url to url object
+        const urlObj = new URL(url);
+        hostname.set(urlObj.hostname);
         currUrl.set(url.pathname);
         return { status: 200 };
     }
