@@ -114,8 +114,8 @@
     }
 </script>
 
-<div class="flex-none space-x-4 md:flex">
-    <div class="w-60 sidebar">
+<div class="flex-none space-x-4 md:flex container-2xl">
+    <div class="w-60 h-full sticky top-4">
         <Search searchParams={$params.tagSearchParams}/>
         {#if $derivedTags.length > 0}
             <Tags displayTags={$derivedTags}/>
@@ -131,9 +131,3 @@
         {/if}
     </div>
 </div>
-
-<style>
-    .sidebar {
-        min-width: 15rem;
-    }
-</style>
