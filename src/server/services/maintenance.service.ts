@@ -3,7 +3,7 @@ import cron from 'node-cron';
 import path from 'path';
 import { validate } from 'uuid';
 import { fileBasePath, logger, thumbnailBasePath } from '../server.js';
-import { deleteFile, updateDeleteStatus } from '../utils/file.util.js';
+import { deleteFile, generateThumbnail, updateDeleteStatus } from '../utils/file.util.js';
 import prisma from '../utils/prisma.util.js';
 
 export class MaintenanceService {
@@ -82,6 +82,23 @@ export class MaintenanceService {
             const deletedFile = await deleteFile(file.filename);
             if (!deletedFile) logger.error(`Error deleting file ${ file.id }`, { label: 'trash' });
         }
+        return;
+    }
+
+    /*
+        Get a list of all files names, then regenerate thumbnails for all files
+     */
+    public async regenerateThumbnails() {
+        const files = await prisma.file.findMany({
+            where: { trash: false },
+        });
+
+        logger.info(`Found ${ files.length } files in the database. Processing each file now...`, { label: 'trash' });
+        for (const file of files) {
+            const filePath = `${ file.filename.substring(0, 2) }/${ file.filename }`;
+            await generateThumbnail(filePath);
+        }
+        logger.info('Finished regenerating thumbnails', { label: 'trash' });
         return;
     }
 
@@ -167,6 +184,7 @@ export class MaintenanceService {
 
         this.weeklyRunning = true;
         await this.cleanFileDirectories();
+        await this.regenerateThumbnails();
         this.weeklyRunning = false;
         return;
     }
