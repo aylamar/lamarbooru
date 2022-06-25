@@ -6,8 +6,8 @@
     export async function load({ url }) {
         // convert url to url object
         const urlObj = new URL(url);
-        hostname.set(urlObj.hostname);
-        currUrl.set(url.pathname);
+        hostname.set(urlObj.origin);
+        currUrl.set(urlObj.pathname);
         return { status: 200 };
     }
 
