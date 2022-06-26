@@ -7,7 +7,6 @@ type Params = {
     includeArchive: boolean,
     includeInbox: boolean,
     includeTrash: boolean,
-    isNavigating: boolean,
     idx: number,
 }
 
@@ -17,12 +16,11 @@ export const params = writable<Params>({
     includeArchive: true,
     includeInbox: true,
     includeTrash: false,
-    isNavigating: false,
     idx: 1,
 });
 
 export const pageSize = readable(64);
-export const searchSpecificStatus = writable<boolean>(false);
+export const isNavigating = writable<boolean>(false);
 
 export type tagData = {
     tag: string,

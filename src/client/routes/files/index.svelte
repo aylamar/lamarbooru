@@ -1,7 +1,7 @@
 <script context="module" lang="ts">
     import { toast } from '@zerodevx/svelte-toast';
     import { get } from 'svelte/store';
-    import { derivedParams, files, pageSize, params } from '../../lib/stores/search';
+    import { derivedParams, files, pageSize, params, isNavigating } from '../../lib/stores/search';
 
     export async function load({ fetch, url }) {
         const urlObj = new URL(url);
@@ -15,12 +15,12 @@
         if (status) parsedStatus = status.split('+');
 
         if (!param) param = '';
+        isNavigating.set(true);
         params.set({
             tagSearchParams: param,
             includeArchive: parsedStatus && parsedStatus.includes('archived'),
             includeInbox: parsedStatus && parsedStatus.includes('inbox'),
             includeTrash: trash == 'true',
-            isNavigating: false,
             idx: 1 + get(pageSize),
         });
 
@@ -31,9 +31,9 @@
             if (!res.ok) new Error(`${ res.status } ${ res.statusText }`);
             let body = await res.json();
             files.set(body);
+            isNavigating.set(false);
             return {
                 files: body,
-                params: get(params),
             };
         } catch (e) {
             if (e.name === 'TypeError') console.log(e)
@@ -76,10 +76,10 @@
                             '--toastBarBackground': '#2F855A',
                         },
                     });
-                    return $params.isNavigating = true;
+                    return $isNavigating = true;
                 }
 
-                $params.isNavigating = false;
+                $isNavigating = false;
                 $files = [...$files, ...body];
             },
         });
@@ -116,6 +116,7 @@
 
 <div class="flex-none space-x-4 md:flex container-2xl">
     <div class="w-60 h-full sticky top-4">
+        <span>{$isNavigating} {$pageSize} {$params.idx}</span>
         <Search searchParams={$params.tagSearchParams}/>
         {#if $derivedTags.length > 0}
             <Tags displayTags={$derivedTags}/>
@@ -126,7 +127,7 @@
         {#each $files as file}
             <Thumbnail filename={file.filename} id={file.id} status={file.status}/>
         {/each}
-        {#if $params.isNavigating === false}
+        {#if $isNavigating === false}
             <div on:enterViewport={() => fetchFiles()} use:viewport></div>
         {/if}
     </div>
